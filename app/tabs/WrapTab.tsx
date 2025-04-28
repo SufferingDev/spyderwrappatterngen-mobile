@@ -1,4 +1,3 @@
-// File: tabs/WrapTab.tsx
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Card from '../components/shared/Card';
@@ -13,6 +12,14 @@ interface WrapTabProps {
   setTotalLayers: (text: string) => void;
   perLayer: string;
   setPerLayer: (text: string) => void;
+  burnishPcg: string,
+  setBurnishPcg: (text: string) => void;
+  rampStep: string,
+  setRampStep: (text: string) => void;
+  startSpeed: string,
+  setStartSpeed: (text: string) => void;
+  finalSpeed: string,
+  setFinalSpeed: (text: string) => void;
 }
 
 const WrapTab = ({
@@ -23,40 +30,91 @@ const WrapTab = ({
   totalLayers,
   setTotalLayers,
   perLayer,
-  setPerLayer
+  setPerLayer,
+  burnishPcg,
+  setBurnishPcg,
+  rampStep,
+  setRampStep,
+  startSpeed,
+  setStartSpeed,
+  finalSpeed,
+  setFinalSpeed
 }: WrapTabProps) => {
   return (
-    <Card title="Wrap Speed Variables">
-      <View style={styles.inputRow}>
-        <InputField 
-          label="Feedrate" 
-          value={feedrate} 
-          onChangeText={setFeedrate}
-          keyboardType="numeric"
-        />
-        <InputField 
-          label="Overwrap%" 
-          value={overwrap} 
-          onChangeText={setOverwrap}
-          keyboardType="numeric"
-        />
-      </View>
+    <View>
+      <Card title="Wrap Speed Variables">
+        <View style={styles.inputRow}>
+          <InputField 
+            label="Feedrate" 
+            value={feedrate} 
+            onChangeText={setFeedrate}
+            validateType='float'
+            minValue={0}
+          />
+          <InputField 
+            label="Overwrap%" 
+            value={overwrap} 
+            onChangeText={setOverwrap}
+            validateType='float'
+            minValue={0}
+          />
+        </View>
 
-      <View style={styles.inputRow}>
-        <InputField 
-          label="Total Layers" 
-          value={totalLayers} 
-          onChangeText={setTotalLayers}
-          keyboardType="numeric"
-        />
-        <InputField 
-          label="Per Layer" 
-          value={perLayer} 
-          onChangeText={setPerLayer}
-          keyboardType="numeric"
-        />
-      </View>
-    </Card>
+        <View style={styles.inputRow}>
+          <InputField 
+            label="Total Layers" 
+            value={totalLayers} 
+            onChangeText={setTotalLayers}
+            validateType='float'
+            minValue={0}
+          />
+          <InputField 
+            label="Per Layer" 
+            value={perLayer} 
+            onChangeText={setPerLayer}
+            validateType='float'
+            minValue={0}
+          />
+        </View>
+      </Card>
+
+      <Card title="Burnish Variables">
+        <View style={styles.inputRow}>
+          <InputField 
+            label="Burnish %" 
+            value={burnishPcg} 
+            onChangeText={setBurnishPcg}
+            validateType='float'
+            minValue={0}
+          />
+          <InputField 
+            label="Ramp Steps" 
+            value={rampStep} 
+            onChangeText={setRampStep}
+            validateType='float'
+            minValue={0}
+          />
+        </View>
+
+        <View style={styles.inputRow}>
+          <InputField 
+            label="Start Speed" 
+            value={startSpeed} 
+            onChangeText={setStartSpeed}
+            validateType='float'
+            minValue={0}
+          />
+          <InputField 
+            label="Final Speed" 
+            value={finalSpeed} 
+            onChangeText={setFinalSpeed}
+            validateType='float'
+            minValue={0}
+          />
+        </View>
+      </Card>
+    </View>
+    
   );
 };
 

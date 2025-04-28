@@ -1,4 +1,3 @@
-// File: tabs/ShellTab.tsx
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Card from '../components/shared/Card';
@@ -13,6 +12,14 @@ interface ShellTabProps {
   setDiameter: (text: string) => void;
   circ: string;
   setCirc: (text: string) => void;
+  yaixs: string;
+  setYaixs: (text: string) => void;
+  totalKick: string;
+  setTotalKick: (text: string) => void;
+  kickRatio: string;
+  setKickRatio: (text: string) => void;
+  TapeFeet: string;
+  setTapeFeet: (text: string) => void;
   shellDescription: string;
   setShellDescription: (text: string) => void;
 }
@@ -26,6 +33,14 @@ const ShellTab = ({
   setDiameter,
   circ,
   setCirc,
+  yaixs,
+  setYaixs,
+  totalKick,
+  setTotalKick,
+  kickRatio,
+  setKickRatio,
+  TapeFeet,
+  setTapeFeet,
   shellDescription,
   setShellDescription
 }: ShellTabProps) => {
@@ -36,11 +51,16 @@ const ShellTab = ({
           label="Shell Size" 
           value={shellSize} 
           onChangeText={setShellSize}
+          validateType='float'
+          minValue={0}
+          keyboardType='numeric'
         />
         <InputField 
           label="Meas size" 
           value={measSize} 
           onChangeText={setMeasSize}
+          validateType='float'
+          minValue={0}
         />
       </View>
 
@@ -49,42 +69,47 @@ const ShellTab = ({
           label="Diameter%" 
           value={diameter} 
           onChangeText={setDiameter}
-          keyboardType="numeric"
+          validateType='float'
+          minValue={0}
         />
         <InputField 
           label="Circ+" 
           value={circ} 
           onChangeText={setCirc}
-          keyboardType="numeric"
+          validateType='float'
+          minValue={0}
         />
       </View>
 
       <View style={styles.inputRow}>
         <InputField 
           label="Yaxis%" 
-          value={diameter} 
-          onChangeText={setDiameter}
-          keyboardType="numeric"
+          value={yaixs} 
+          onChangeText={setYaixs}
+          validateType='float'
+          minValue={0}
         />
         <InputField 
           label="Total Kick" 
-          value={circ} 
-          onChangeText={setCirc}
-          keyboardType="numeric"
+          value={totalKick} 
+          onChangeText={setTotalKick}
+          validateType='float'
+          minValue={0}
         />
       </View>
 
       <View style={styles.inputRow}>
         <InputField 
           label="Kick Ratio%" 
-          value={diameter} 
-          onChangeText={setDiameter}
-          keyboardType="numeric"
+          value={kickRatio} 
+          onChangeText={setKickRatio}
+          validateType='float'
+          minValue={0}
         />
         <InputField 
           label="Tape Feet" 
-          value={circ} 
-          onChangeText={setCirc}
+          value={TapeFeet} 
+          onChangeText={setTapeFeet}
           keyboardType="numeric"
         />
       </View>

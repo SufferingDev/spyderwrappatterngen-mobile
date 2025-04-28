@@ -1,6 +1,5 @@
-// File: components/GCodePreview.tsx
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
 
 interface GCodePreviewProps {
   gCode: string;
@@ -10,9 +9,9 @@ const GCodePreview = ({ gCode }: GCodePreviewProps) => {
   return (
     <View style={styles.card}>
       <Text style={styles.cardTitle}>G-Code Preview</Text>
-      <View style={styles.codePreview}>
+      <ScrollView style={styles.codePreview}>
         <Text style={styles.codeText}>{gCode}</Text>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -41,7 +40,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: '#f5f8fa',
     padding: 12,
-    minHeight: 60,
+    minHeight: 120,
+    height: 120,
   },
   codeText: {
     fontFamily: 'monospace',
