@@ -5,6 +5,8 @@ import InputField from '../components/shared/InputField';
 import AreaField from '../components/shared/AreaField';
 
 interface MachineTabProps {
+  isEnablePump: boolean;
+  setIsEnablePump: (value: boolean) => void;
   pumpOnCode: string;
   setPumpOnCode: (text: string) => void;  
   pumpOffCode: string;
@@ -23,6 +25,8 @@ interface MachineTabProps {
 }
 
 const MachineTab = ({
+  isEnablePump,
+  setIsEnablePump,
   pumpOnCode,
   setPumpOnCode,
   pumpOffCode,
@@ -38,19 +42,29 @@ const MachineTab = ({
   endOfCompleteWrap,
   setEndOfCompleteWrap
 }: MachineTabProps) => {
+
+  const handleToggleChange = (enabled: boolean) : void => {
+    setIsEnablePump(enabled); // Update the parent state
+  }
+
   return (
     <View>
-      <Card title="Pump Variables">
+      <Card title="Pump Variables"
+        showToggle={true} 
+        initialEnabled={isEnablePump}
+        onToggleChange={handleToggleChange}>
         <View style={styles.inputRow}>
           <InputField
             label="Pump on Code"
             value={pumpOnCode}
             onChangeText={setPumpOnCode}
+            editable={isEnablePump}
           />
           <InputField
             label="Pump off Code"
             value={pumpOffCode}
             onChangeText={setPumpOffCode}
+            editable={isEnablePump}
           />
         </View>
         <View style={styles.inputRow}>
@@ -60,6 +74,7 @@ const MachineTab = ({
             onChangeText={setCycPerShell}
             validateType='float'
             minValue={0}
+            editable={isEnablePump}
           />
           <InputField
             label="Duration"
@@ -67,6 +82,7 @@ const MachineTab = ({
             onChangeText={setDuration}
             validateType='float'
             minValue={0}
+            editable={isEnablePump}
           />
         </View>
       </Card>

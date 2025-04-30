@@ -71,6 +71,7 @@ interface InputFieldProps {
   minValue?: number;
   maxValue?: number;
   onValidationChange?: (isValid: boolean) => void;
+  editable?: boolean;
 }
 
 const InputField = ({
@@ -83,7 +84,8 @@ const InputField = ({
   validateType = 'none',
   minValue,
   maxValue,
-  onValidationChange
+  onValidationChange,
+  editable = true,
 }: InputFieldProps) => {
   const [error, setError] = useState<string>('');
   const [touched, setTouched] = useState<boolean>(false);
@@ -188,6 +190,7 @@ const InputField = ({
         onBlur={handleBlur}
         placeholder=""
         keyboardType={getKeyboardType()}
+        editable={editable}
       />
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>

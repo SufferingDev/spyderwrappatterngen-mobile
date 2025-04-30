@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { View } from 'react-native';
+import Toast from './components/NotificationToast';
 
 // Component imports
 import Header from './components/Header';
@@ -22,8 +23,11 @@ import MachineTapContent from './tabs/machineTab';
 import { tapGestureHandlerProps } from 'react-native-gesture-handler/lib/typescript/handlers/TapGestureHandler';
 
 import genMainGCode from './utils/genGCode';
+import * as utils from './utils/utils';
+
 
 export default function Index() {
+  
   const [activeTab, setActiveTab] = useState('SHELL');
   
   // Shell tab state
@@ -44,12 +48,14 @@ export default function Index() {
   const [perLayer, setPerLayer] = useState('');
 
   // Burnish state
+  const [isEnableBurnish, setIsEnableBurnish] = useState(false);
   const [burnishPcg, setBurnishPcg] = useState('');
   const [rampStep, setRampStep] = useState('');
   const [startSpeed, setStartSpeed] = useState('');
   const [finalSpeed, setFinalSpeed] = useState('');
 
   // Pump State
+  const [isEnablePump, setIsEnablePump] = useState(false);
   const [pumpOnCode, setPumpOnCode] = useState('');
   const [pumpOffCode, setPumpOffCode] = useState('');
   const [cycPerShell, setCycPerShell] = useState('');
@@ -61,7 +67,31 @@ export default function Index() {
   const [endOfCompleteWrap, setEndOfCompleteWrap] = useState('');
   const [gCode, setGCode] = useState('(G-Code will appear here)');
 
+
+  const [showToast, setShowToast] = useState(false);
+
   const handleGenerate = () => {
+    // Validate the all fields
+    if (utils.hasEmptyInputs([shellSize, measSize, diameter, circ, yaixs, totalKick, kickRatio, feedrate, overwrap, totalLayers, perLayer])) {
+      setShowToast(true);
+      return;
+    }
+
+    if (shellDescription.trim() === ''){
+      setShowToast(true);
+      return;
+    }
+
+    if (isEnableBurnish && utils.hasEmptyInputs([burnishPcg, rampStep, startSpeed, finalSpeed])){
+      setShowToast(true);
+      return;
+    }
+
+    if (isEnablePump && utils.hasEmptyInputs([pumpOnCode, pumpOffCode, cycPerShell, duration])){
+      setShowToast(true);
+      return;
+    }
+    /*
     // Logic to generate G-Code would go here
 
     // const numShellSize = parseInt(shellSize, 10); 
@@ -75,7 +105,7 @@ export default function Index() {
     // const numFeedrate = parseInt(feedrate, 10); 
     // const numOverWrap = parseInt(overwrap, 10) / 100; 
     // const numTotalLayers = parseInt(totalLayers, 10); 
-    // const numPerLayer = parseInt(perLayer, 10); 
+    // const numPerLayer = parseInt(peLayer, 10); 
 
     // const numBurnishPcg = parseInt(burnishPcg, 10); 
     // const numRampStep = parseInt(rampStep, 10); 
@@ -87,27 +117,39 @@ export default function Index() {
 
 
 
-
+    // Shell Size variables
     const numMeasSize = parseFloat(measSize);
     const numDiameter = parseFloat(diameter) / 100;
     const numCirc = parseFloat(circ);
+    const numYaixs = parseFloat(yaixs); // Adjust if division by 100 is needed
   
     const numTotalKick = parseFloat(totalKick) / 100;
     const numKickRatio = parseFloat(kickRatio) / 100;
-  
+
+    // Wrap Speed variables
+    const numFeedrate = parseFloat(feedrate);  
     const numOverWrap = parseFloat(overwrap) / 100;
-    const numPerLayer = parseInt(perLayer, 10);
     const numTotalLayers = parseInt(totalLayers, 10);
+    const numPerLayer = parseInt(perLayer, 10);
   
-    const numYaixs = parseFloat(yaixs); // Adjust if division by 100 is needed
-  
+    // Burnish variable
+    const numBurnishPcg = parseFloat(burnishPcg) / 100;
+    const numRampStep = parseInt(rampStep, 10);
+    const numStartSpeed = parseFloat(startSpeed);
+    const numFinalSpeed = parseFloat(finalSpeed);
+
+    // Pump variables
+    const numCycPerShell = parseInt(cycPerShell, 10);
+    const numDuration = parseFloat(duration);
 
 
-    const ggg = genMainGCode(2,0.02,2,0.02,2,0.02,2,0.02,2,2,true,2,2,2,2,true,'On','Off',2,2,'dfkd','endm','endc','name');
+    const mainGCode = genMainGCode(numMeasSize, numDiameter, numCirc, numTotalKick, numYaixs, numKickRatio,numFeedrate,numOverWrap,numPerLayer,numTotalLayers, isEnableBurnish,numBurnishPcg,numRampStep,numStartSpeed,numFinalSpeed,isEnablePump, pumpOnCode, pumpOffCode, numCycPerShell, numDuration, startupGCode, endOfMainWrap, endOfCompleteWrap, 'name');
 
-    setTapeFeet(ggg.estTapeFeet);
+    setTapeFeet(mainGCode.estTapeFeet.toString());
 
-    setGCode(ggg.entireGCode);
+    setGCode(mainGCode.entireGCode);
+
+    */
   };
 
   // Render active tab content
@@ -148,6 +190,8 @@ export default function Index() {
             perLayer={perLayer}
             setPerLayer={setPerLayer}
 
+            isEnableBurnish={isEnableBurnish}
+            setIsEnableBurnish={setIsEnableBurnish}
             burnishPcg={burnishPcg}
             setBurnishPcg={setBurnishPcg}
             rampStep={rampStep}
@@ -161,6 +205,8 @@ export default function Index() {
       case 'BURNISH':
         return (
           <MachineTapContent
+            isEnablePump={isEnablePump}
+            setIsEnablePump={setIsEnablePump}
             pumpOnCode={pumpOnCode}
             setPumpOnCode={setPumpOnCode}
             pumpOffCode={pumpOffCode}
@@ -193,11 +239,18 @@ export default function Index() {
       {/* Tabs */}
       <TabBar activeTab={activeTab} setActiveTab={setActiveTab} />
 
+      
+
       <ScrollView style={styles.contentContainer}>
         {/* Render content based on active tab */}
         {renderActiveTabContent()}
       </ScrollView>
 
+      <Toast
+        message={`Please enter all the dependencies`}
+        visible={showToast}
+        onHide={() => setShowToast(false)}
+      />               
       {/* G-Code Preview - shown on all tabs */}
       <GCodePreview gCode={gCode} />
 
