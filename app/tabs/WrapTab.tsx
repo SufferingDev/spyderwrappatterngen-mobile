@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState }  from 'react';
 import { StyleSheet, View } from 'react-native';
+import Toggle from 'react-native-toggle-element';
 import Card from '../components/shared/Card';
 import InputField from '../components/shared/InputField';
 
@@ -12,6 +13,9 @@ interface WrapTabProps {
   setTotalLayers: (text: string) => void;
   perLayer: string;
   setPerLayer: (text: string) => void;
+
+  isEnableBurnish: boolean;
+  setIsEnableBurnish: (value: boolean) => void;
   burnishPcg: string,
   setBurnishPcg: (text: string) => void;
   rampStep: string,
@@ -31,6 +35,9 @@ const WrapTab = ({
   setTotalLayers,
   perLayer,
   setPerLayer,
+
+  isEnableBurnish,
+  setIsEnableBurnish,
   burnishPcg,
   setBurnishPcg,
   rampStep,
@@ -40,6 +47,11 @@ const WrapTab = ({
   finalSpeed,
   setFinalSpeed
 }: WrapTabProps) => {
+
+  const handleToggleChange = (enabled: boolean) => {
+    setIsEnableBurnish(enabled); // Update the parent state
+  };
+
   return (
     <View>
       <Card title="Wrap Speed Variables">
@@ -50,6 +62,7 @@ const WrapTab = ({
             onChangeText={setFeedrate}
             validateType='float'
             minValue={0}
+            required={true}
           />
           <InputField 
             label="Overwrap%" 
@@ -57,6 +70,7 @@ const WrapTab = ({
             onChangeText={setOverwrap}
             validateType='float'
             minValue={0}
+            required={true}
           />
         </View>
 
@@ -67,6 +81,7 @@ const WrapTab = ({
             onChangeText={setTotalLayers}
             validateType='float'
             minValue={0}
+            required={true}
           />
           <InputField 
             label="Per Layer" 
@@ -74,18 +89,45 @@ const WrapTab = ({
             onChangeText={setPerLayer}
             validateType='float'
             minValue={0}
+            required={true}
           />
         </View>
       </Card>
 
-      <Card title="Burnish Variables">
+      <Card title="Burnish Variables"
+        showToggle={true} 
+        initialEnabled={isEnableBurnish}
+        onToggleChange={handleToggleChange}
+        >
+      {/* <Toggle
+        value={isToggled}
+        onPress={() => setIsToggled(!isToggled)}
+        trackBar={{
+          activeBackgroundColor: '#4caf50',
+          inActiveBackgroundColor: '#f44336',
+          width: 50,
+          height: 15,
+          radius: 15,
+        }}
+        thumbButton={{
+          width: 25,
+          height: 25,
+          radius: 12.5,
+          activeBackgroundColor: 'gray',
+          inActiveBackgroundColor: 'blue',
+        }}
+      /> */}
+      {/* <Text style={styles.status}>
+        {isToggled ? 'Switch is ON' : 'Switch is OFF'}
+      </Text> */}
         <View style={styles.inputRow}>
           <InputField 
-            label="Burnish %" 
+            label="Burnish %"  
             value={burnishPcg} 
             onChangeText={setBurnishPcg}
             validateType='float'
             minValue={0}
+            editable={isEnableBurnish}
           />
           <InputField 
             label="Ramp Steps" 
@@ -93,6 +135,7 @@ const WrapTab = ({
             onChangeText={setRampStep}
             validateType='float'
             minValue={0}
+            editable={isEnableBurnish}
           />
         </View>
 
@@ -103,6 +146,7 @@ const WrapTab = ({
             onChangeText={setStartSpeed}
             validateType='float'
             minValue={0}
+            editable={isEnableBurnish}
           />
           <InputField 
             label="Final Speed" 
@@ -110,6 +154,7 @@ const WrapTab = ({
             onChangeText={setFinalSpeed}
             validateType='float'
             minValue={0}
+            editable={isEnableBurnish}
           />
         </View>
       </Card>
@@ -122,6 +167,22 @@ const styles = StyleSheet.create({
   inputRow: {
     flexDirection: 'row',
     marginBottom: 12,
+  },
+
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  label: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  status: {
+    marginTop: 20,
+    fontSize: 16,
+    color: '#333',
   },
 });
 

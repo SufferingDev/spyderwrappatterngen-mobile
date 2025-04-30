@@ -70,3 +70,18 @@ export const replacevariables = (
         return match;
     });
 }
+
+function isNumeric(input: string): boolean {
+    return /^\d+$/.test(input);
+}
+
+export const hasEmptyInputs = (inputs: string[]): boolean => {
+// return inputs.some(value => !value || value.trim() === '');
+    // inputs.map((value) => {
+    //     console.log(value, isNumeric(value));
+    //     if (!isNumeric(value))
+    //         return false;
+    // })
+    // return true;
+    return inputs.some(element => !isNumeric(element));
+};

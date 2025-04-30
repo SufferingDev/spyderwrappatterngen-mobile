@@ -269,6 +269,7 @@ console.log(numBurnishPcg, burnishLayerCount);
     // Add End of Completed Wrap
     gcodeOutput += replaceVariables(strEndComWrap);
 
+    estTapeFeet = parseFloat(estTapeFeet.toFixed(3));
     // // Set the final output text at once
     // TxtGcodeOutput.textContent = gcodeOutput;
 
