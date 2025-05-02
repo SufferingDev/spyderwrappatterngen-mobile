@@ -2,22 +2,25 @@ import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
 interface ActionButtonsProps {
+  onLoad: () => void;
+  onSave: () => void;
   onGenerate: () => void;
+  onExport: () => void;
 }
 
-const ActionButtons = ({ onGenerate }: ActionButtonsProps) => {
+const ActionButtons = ({ onLoad, onSave, onGenerate, onExport }: ActionButtonsProps) => {
   return (
     <View style={styles.buttonRow}>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={onLoad}>
         <Text style={styles.buttonText}>LOAD</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={onSave}>
         <Text style={styles.buttonText}>SAVE</Text>
       </TouchableOpacity>
       <TouchableOpacity style={[styles.button, styles.generateButton]} onPress={onGenerate}>
         <Text style={[styles.buttonText, styles.generateButtonText]}>GENERATE</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={onExport}>
         <Text style={styles.buttonText}>EXPORT</Text>
       </TouchableOpacity>
     </View>

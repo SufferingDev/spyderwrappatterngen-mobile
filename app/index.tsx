@@ -8,6 +8,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { View } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system';
+
 import Toast from './components/NotificationToast';
 
 // Component imports
@@ -70,6 +73,52 @@ export default function Index() {
 
   const [showToast, setShowToast] = useState(false);
 
+  const handleLoad = async () => {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: '*/*', // Allows all file types
+      multiple: false, // Set to true for multi-select
+    });
+  
+    if (result.type === 'success') {
+      // result contains: uri, name, size, mimeType
+      console.log(result);
+    } else {
+      // User cancelled the picker
+      console.log('Document picking cancelled');
+    }
+  }
+
+async function showSaveDialogAndSaveFile(content: string, fileName: string, mimeType: string) {
+      // Step 1: Ask user to pick a folder
+      const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+      if (!permissions.granted) {
+        alert('Permission not granted');
+        return;
+      }
+    
+      // Step 2: Create a file in the selected folder
+      const fileUri = await FileSystem.StorageAccessFramework.createFileAsync(
+        permissions.directoryUri,
+        fileName,
+        mimeType
+      );
+    
+      // Step 3: Write content to the file
+      await FileSystem.writeAsStringAsync(fileUri, content);
+      alert('File saved!');
+    }
+  
+
+  const handleSave = () => {
+
+    showSaveDialogAndSaveFile('Hello, world!', 'myfile.txt', 'text/plain');
+
+  }
+
+  const handleExport = () => {
+
+  }
+
   const handleGenerate = () => {
     // Validate the all fields
     if (utils.hasEmptyInputs([shellSize, measSize, diameter, circ, yaixs, totalKick, kickRatio, feedrate, overwrap, totalLayers, perLayer])) {
@@ -111,10 +160,11 @@ export default function Index() {
     // const numRampStep = parseInt(rampStep, 10); 
     // const numStartSpeed = parseInt(startSpeed, 10); 
     // const numFinalSpeed = parseInt(finalSpeed, 10); 
-
+    
     // const numXOffSet: number = numMeasSize * Math.PI * numDiameter * numTotalKick;
-
-
+    
+    
+    */
 
 
     // Shell Size variables
@@ -149,7 +199,7 @@ export default function Index() {
 
     setGCode(mainGCode.entireGCode);
 
-    */
+
   };
 
   // Render active tab content
@@ -255,7 +305,12 @@ export default function Index() {
       <GCodePreview gCode={gCode} />
 
       {/* Bottom Buttons */}
-      <ActionButtons onGenerate={handleGenerate} />
+      <ActionButtons 
+        onLoad={handleLoad}
+        onSave={handleSave}
+        onGenerate={handleGenerate}
+        onExport={handleExport}
+        />
       
       {/* Floating Action Button */}
       <TouchableOpacity style={styles.fab}>
