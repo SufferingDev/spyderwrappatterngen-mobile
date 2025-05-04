@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { View } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
+import { Platform } from 'react-native';
 
 import Toast from './components/NotificationToast';
 
@@ -32,6 +33,8 @@ import * as utils from './utils/utils';
 export default function Index() {
   
   const [activeTab, setActiveTab] = useState('SHELL');
+
+  const [patternName, setPatternName] = useState('');
   
   // Shell tab state
   const [shellSize, setShellSize] = useState('');
@@ -41,7 +44,7 @@ export default function Index() {
   const [yaixs, setYaixs] = useState('');
   const [totalKick, setTotalKick] = useState('');
   const [kickRatio, setKickRatio] = useState('');
-  const [TapeFeet, setTapeFeet] = useState('');
+  const [tapeFeet, setTapeFeet] = useState('');
   const [shellDescription, setShellDescription] = useState('');
   
   // Wrap tab state
@@ -75,48 +78,139 @@ export default function Index() {
 
   const handleLoad = async () => {
     const result = await DocumentPicker.getDocumentAsync({
-      type: '*/*', // Allows all file types
-      multiple: false, // Set to true for multi-select
+      type: '*/*', // Allow all file types including .mum
+      multiple: false,
     });
   
     if (result.type === 'success') {
-      // result contains: uri, name, size, mimeType
-      console.log(result);
+      try {
+        // Read the file content as a string
+        const fileContent = await FileSystem.readAsStringAsync(result.uri);
+  
+        // Parse the JSON content
+        const jsonData = JSON.parse(fileContent);
+  
+        // Now you can access values from jsonData
+        console.log('Parsed JSON:', jsonData);
+  
+        // Example: access a property
+
+
+
+
+        setPatternName(jsonData.Pattern_Name ?? '');
+
+        setShellSize(jsonData.Shell_Size ?? '');
+        setMeasSize(jsonData.Measured_Size ?? '');
+        setDiameter(jsonData.Diameter_Percentage ?? '');
+        setCirc(jsonData.Circ_Plus ?? '');
+        setYaixs(jsonData.YAixs_Percentage ?? '');
+        setTotalKick(jsonData.Total_Kick ?? '');
+        setKickRatio(jsonData.Kick_Ratio ?? '');
+        setShellDescription(jsonData.Shell_Description ?? '');
+
+        setFeedrate(jsonData.Wrap_Feedrate ?? '');
+        setOverwrap(jsonData.Overwrap_Percentage ?? '');
+        setTotalLayers(jsonData.Total_Layers ?? '');
+        setPerLayer(jsonData.Wraps_Per_Layer ?? '');
+        
+        setBurnishPcg(jsonData.Burnish_Layer_Percentage ?? '');
+        setRampStep(jsonData.Burnish_Start_Speed ?? '');
+        setStartSpeed(jsonData.Burnish_Ramp_Steps ?? '');
+        setFinalSpeed(jsonData.Burnish_Final_Steps ?? '');
+        
+        setStartupGCode(jsonData.Startup_Gcode ?? '');
+        setEndOfMainWrap(jsonData.End_Of_Main_Wrap ?? '');
+        setEndOfCompleteWrap(jsonData.End_Of_Complete_Wrap ?? '');
+        
+        setIsEnablePump(jsonData.Pump_Enable ?? false);
+        setPumpOnCode(jsonData.Pump_On_Code ?? '');
+        setPumpOffCode(jsonData.Pump_Off_Code ?? '');
+        setCycPerShell(jsonData.Pump_Cycles ?? '');
+        setDuration(jsonData.Pump_Duration ?? '');
+        
+        setTapeFeet(jsonData.Total_Estimated_Feet ?? '');
+        
+        // console.log(jsonData.someKey);
+  
+      } catch (error) {
+        console.error('Error parsing JSON:', error);
+      }
     } else {
-      // User cancelled the picker
       console.log('Document picking cancelled');
     }
   }
 
-async function showSaveDialogAndSaveFile(content: string, fileName: string, mimeType: string) {
-      // Step 1: Ask user to pick a folder
-      const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-      if (!permissions.granted) {
-        alert('Permission not granted');
-        return;
-      }
-    
-      // Step 2: Create a file in the selected folder
-      const fileUri = await FileSystem.StorageAccessFramework.createFileAsync(
-        permissions.directoryUri,
-        fileName,
-        mimeType
-      );
-    
-      // Step 3: Write content to the file
-      await FileSystem.writeAsStringAsync(fileUri, content);
-      alert('File saved!');
+  async function showSaveDialogAndSaveFile(content: string, fileName: string, mimeType: string) {
+    // Step 1: Ask user to pick a folder
+    const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+    if (!permissions.granted) {
+      alert('Permission not granted');
+      return;
     }
   
+    // Step 2: Create a file in the selected folder
+    const fileUri = await FileSystem.StorageAccessFramework.createFileAsync(
+      permissions.directoryUri,
+      fileName,
+      mimeType
+    );
+  
+    // Step 3: Write content to the file
+    await FileSystem.writeAsStringAsync(fileUri, content);
+    alert('File saved!');
+  }
 
   const handleSave = () => {
+    if (Platform.OS === 'android') {
 
-    showSaveDialogAndSaveFile('Hello, world!', 'myfile.txt', 'text/plain');
 
+      const data = {
+        Pattern_Name: patternName,          // string
+
+        Shell_Description: shellDescription, // string
+        Shell_Size: shellSize,               // string or number
+        Measured_Size: measSize,
+        Diameter_Percentage: diameter,
+        Circ_Plus: circ,
+        YAixs_Percentage: yaixs,
+        Total_Kick: totalKick,
+        Kick_Ratio: kickRatio,
+      
+        Wrap_Feedrate: feedrate,
+        Overwrap_Percentage: overwrap,
+        Total_Layers: totalLayers,
+        Wraps_Per_Layer: perLayer,
+      
+        Burnish_Layer_Percentage: burnishPcg,
+        Burnish_Start_Speed: rampStep,
+        Burnish_Ramp_Steps: startSpeed,
+        Burnish_Final_Steps: finalSpeed,
+      
+        Startup_Gcode: startupGCode,
+        End_Of_Main_Wrap: endOfMainWrap,
+        End_Of_Complete_Wrap: endOfCompleteWrap,
+      
+        Total_Estimated_Feet: tapeFeet, // number or string
+      
+        Pump_Enable: isEnablePump,                 // boolean
+        Pump_On_Code: pumpOnCode,
+        Pump_Off_Code: pumpOffCode,
+        Pump_Cycles: cycPerShell,
+        Pump_Duration: duration,
+      };
+      
+      // Convert to JSON string with indentation
+      const formData = JSON.stringify(data, null, 2);
+
+      showSaveDialogAndSaveFile(formData, patternName + '.mum', 'text/plain');
+    }
   }
 
   const handleExport = () => {
-
+    if (gCode !== '') {
+      showSaveDialogAndSaveFile(gCode, patternName + '.gco', 'text/plain');
+    }
   }
 
   const handleGenerate = () => {
@@ -222,7 +316,7 @@ async function showSaveDialogAndSaveFile(content: string, fileName: string, mime
             setTotalKick={setTotalKick}
             kickRatio={kickRatio}
             setKickRatio={setKickRatio}
-            TapeFeet={TapeFeet}
+            TapeFeet={tapeFeet}
             setTapeFeet={setTapeFeet}
             shellDescription={shellDescription}
             setShellDescription={setShellDescription}
