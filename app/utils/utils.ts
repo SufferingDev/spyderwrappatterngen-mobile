@@ -71,17 +71,19 @@ export const replacevariables = (
     });
 }
 
-function isNumeric(input: string): boolean {
-    return /^\d+$/.test(input);
+export const isEmpty = (input: string): boolean => {
+    return input === undefined || input === null || input.trim() === '';
+};
+
+export const isNumeric = (input: string): boolean => {
+    // This regex pattern accepts:
+    // - Whole numbers
+    // - Decimal numbers
+    // - No negative numbers
+    // - Prevents multiple dots
+    return /^\d*\.?\d+$/.test(input);
 }
 
 export const hasEmptyInputs = (inputs: string[]): boolean => {
-// return inputs.some(value => !value || value.trim() === '');
-    // inputs.map((value) => {
-    //     console.log(value, isNumeric(value));
-    //     if (!isNumeric(value))
-    //         return false;
-    // })
-    // return true;
     return inputs.some(element => !isNumeric(element));
 };
