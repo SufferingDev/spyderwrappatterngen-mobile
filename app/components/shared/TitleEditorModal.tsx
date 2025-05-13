@@ -18,6 +18,7 @@ interface TitleEditorModalProps {
   onExtensionChange?: (extension: string) => void;
   onSave: () => void;
   onCancel: () => void;
+  title: string;
 }
 
 const TitleEditorModal = memo(
@@ -30,6 +31,7 @@ const TitleEditorModal = memo(
     onExtensionChange,
     onSave,
     onCancel,
+    title,
   }: TitleEditorModalProps) => {
     const handleSave = useCallback(() => {
       // Perform validation before calling onSave
@@ -47,7 +49,7 @@ const TitleEditorModal = memo(
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Enter Pattern Name</Text>
+            <Text style={styles.modalTitle}>{title}</Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={[

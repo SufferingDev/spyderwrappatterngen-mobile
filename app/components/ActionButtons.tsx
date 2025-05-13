@@ -4,6 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 interface ActionButtonsProps {
   onLoad: () => void;
   onSave: () => void;
+  onSaveAsNew: () => void;
   onGenerate: () => void;
   onExport: () => void;
 }
@@ -11,6 +12,7 @@ interface ActionButtonsProps {
 const ActionButtons = ({
   onLoad,
   onSave,
+  onSaveAsNew,
   onGenerate,
   onExport,
 }: ActionButtonsProps) => {
@@ -28,7 +30,7 @@ const ActionButtons = ({
       <TouchableOpacity style={styles.button} onPress={onExport}>
         <Text style={styles.buttonText}>EXPORT</Text>
       </TouchableOpacity> */}
-      <TouchableOpacity style={styles.button} onPress={onSave}>
+      <TouchableOpacity style={styles.button} onPress={onSaveAsNew}>
         <Text style={styles.buttonText}>SAVE AS NEW</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={onExport}>

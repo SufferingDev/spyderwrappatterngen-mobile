@@ -6,7 +6,6 @@ import {
   Platform,
   SafeAreaView,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -19,7 +18,6 @@ import TitleEditorModal from "./components/shared/TitleEditorModal";
 // Component imports
 import ActionButtons from "./components/ActionButtons";
 import GCodePreview from "./components/GCodePreview";
-import Header from "./components/Header";
 import TabBar from "./components/TabBar";
 
 // Tab content components
@@ -33,9 +31,18 @@ import * as utils from "./utils/utils";
 export default function Index() {
   const [activeTab, setActiveTab] = useState("SHELL");
 
-  const [tmpPatternName, setTmpPatternName] = useState("");
+  const [openFilePath, setOpenFilePath] = useState("");
+  const [openFileName, setOpenFileName] = useState("");
+
+  const [tmpOpenFileName, setTmpOpenFileName] = useState("");
+  const [tmpExportFileName, setTmpExportFileName] = useState("");
+
   const [patternName, setPatternName] = useState("");
-  const [showTitleEditor, setShowTitleEditor] = useState(false);
+
+  const [showSaveFileTitleEditorModal, setShowSaveFileTitleEditorModal] =
+    useState(false);
+  const [showExportFileTitleEditorModal, setShowExportFileTitleEditorModal] =
+    useState(false);
 
   // Shell tab state
   const [shellSize, setShellSize] = useState("");
@@ -83,14 +90,18 @@ export default function Index() {
   const [selectedExtension, setSelectedExtension] = useState(".mum");
   const fileExtensions = [".mum", ".gcode"]; // Add your extensions here
 
+  const displayToast = (message: string) => {
+    // setShowToast(false); // Hide any existing toast
+    setToastMessage(message);
+    setShowToast(true);
+  };
+
   const handleLoad = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
         type: "*/*", // Allow all file types
         multiple: false,
       });
-
-      console.log("DocumentPicker result:", result);
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const selectedFile = result.assets[0];
@@ -113,6 +124,9 @@ export default function Index() {
         const fileContent = await FileSystem.readAsStringAsync(
           selectedFile.uri
         );
+
+        setOpenFilePath(selectedFile.uri);
+        setOpenFileName(selectedFile.name);
         const jsonData = JSON.parse(fileContent);
 
         // Set state values here...
@@ -143,97 +157,18 @@ export default function Index() {
         setDuration(jsonData.Pump_Duration ?? "");
         setTapeFeet(jsonData.Total_Estimated_Feet ?? "");
 
-        setToastMessage("File loaded successfully");
-        setShowToast(true);
+        setGCode("(G-Code will appear here)"); // Reset G-Code preview
+        displayToast("File loaded successfully");
       } else {
         console.log("Document picking was canceled or returned no data");
       }
     } catch (error) {
       console.error("Error loading file:", error);
-      setToastMessage("Failed to load file");
-      setShowToast(true);
+      displayToast("Failed to load file");
     }
   };
 
-  const pickFolderAndSave = async (
-    content: string,
-    fileName: string
-  ): Promise<void> => {
-    try {
-      if (Platform.OS !== "android" && Platform.OS !== "ios") {
-        alert("File saving is only supported on mobile platforms");
-        return;
-      }
-
-      // For Android, we'll use the Storage Access Framework
-      if (Platform.OS === "android") {
-        try {
-          const permissions =
-            await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-
-          // User cancelled the folder picker
-          if (!permissions.granted || !permissions.directoryUri) {
-            // Don't show error, just return silently
-            return;
-          }
-
-          const fileUri =
-            await FileSystem.StorageAccessFramework.createFileAsync(
-              permissions.directoryUri,
-              fileName + ".mum",
-              "application/json"
-            );
-
-          await FileSystem.writeAsStringAsync(fileUri, content);
-          setToastMessage(`File saved successfully as ${fileName}.mum`);
-          setShowToast(true);
-        } catch (error) {
-          // Only show error if it's not a user cancellation
-          if (
-            error instanceof Error &&
-            !error.message.includes("User cancelled")
-          ) {
-            console.error("Error saving file:", error);
-            setToastMessage("Failed to save file. Please try again.");
-            setShowToast(true);
-          }
-        }
-      }
-      // For iOS, we'll use document picker to get a security-scoped URL
-      else if (Platform.OS === "ios") {
-        // On iOS, we can save to the app's documents directory
-        const documentDirectory = FileSystem.documentDirectory;
-        const fileUri = `${documentDirectory}${fileName}.mum`;
-
-        await FileSystem.writeAsStringAsync(fileUri, content);
-
-        // Share the file so user can save it elsewhere
-        await FileSystem.shareAsync(fileUri, {
-          mimeType: "application/json",
-          dialogTitle: `Save ${fileName}.mum`,
-          UTI: "public.json",
-        });
-      }
-    } catch (err: unknown) {
-      console.error("Error saving file:", err);
-
-      if (err instanceof Error) {
-        // Only show error message if it's not related to user cancellation
-        if (!err.message.includes("cancelled")) {
-          setToastMessage(`Failed to save file: ${err.message}`);
-          setShowToast(true);
-        }
-      }
-    }
-  };
-
-  const handleSave = () => {
-    if (tmpPatternName.trim() === "") {
-      setPatternName(tmpPatternName);
-      setShowTitleEditor(true);
-      return;
-    }
-
+  const collectFormData = () => {
     const data = {
       Pattern_Name: patternName, // string
 
@@ -271,35 +206,167 @@ export default function Index() {
 
     // Convert to JSON string with indentation
     const formData = JSON.stringify(data, null, 2);
-
-    pickFolderAndSave(formData, patternName);
+    return formData;
   };
 
+  const pickFolderAndSave = async (
+    content: string,
+    fileName: string,
+    updateOpenFile: boolean = true
+  ): Promise<void> => {
+    try {
+      if (Platform.OS !== "android" && Platform.OS !== "ios") {
+        alert("File saving is only supported on mobile platforms");
+        return;
+      }
+
+      // For Android, we'll use the Storage Access Framework
+      if (Platform.OS === "android") {
+        try {
+          const permissions =
+            await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+          // User cancelled the folder picker
+          if (!permissions.granted || !permissions.directoryUri) {
+            // Don't show error, just return silently
+            return;
+          }
+
+          if (updateOpenFile === true) {
+            const fileUri =
+              await FileSystem.StorageAccessFramework.createFileAsync(
+                permissions.directoryUri,
+                fileName + ".mum",
+                "application/json"
+              );
+
+            setOpenFilePath(fileUri);
+            setOpenFileName(fileName);
+            await FileSystem.writeAsStringAsync(fileUri, content);
+            displayToast(`File saved successfully as ${fileName}.mum`);
+          } else {
+            const fileUri =
+              await FileSystem.StorageAccessFramework.createFileAsync(
+                permissions.directoryUri,
+                fileName,
+                "application/octet-stream"
+              );
+            console.log("File URI:", fileUri);
+            await FileSystem.writeAsStringAsync(fileUri, content);
+            displayToast(`File saved successfully as ${fileName}`);
+          }
+
+          // await FileSystem.writeAsStringAsync(fileUri, content);
+          // displayToast(`File saved successfully as ${fileName}.mum`);
+        } catch (error) {
+          // Only show error if it's not a user cancellation
+          if (
+            error instanceof Error &&
+            !error.message.includes("User cancelled")
+          ) {
+            console.error("Error saving file:", error);
+            displayToast("Failed to save file. Please try again.");
+          }
+        }
+      }
+      // For iOS, we'll use document picker to get a security-scoped URL
+      else if (Platform.OS === "ios") {
+        // On iOS, we can save to the app's documents directory
+        const documentDirectory = FileSystem.documentDirectory;
+        const fileUri = `${documentDirectory}${fileName}.mum`;
+
+        await FileSystem.writeAsStringAsync(fileUri, content);
+
+        // Share the file so user can save it elsewhere
+        await FileSystem.shareAsync(fileUri, {
+          mimeType: "application/json",
+          dialogTitle: `Save ${fileName}.mum`,
+          UTI: "public.json",
+        });
+      }
+    } catch (err: unknown) {
+      console.error("Error saving file:", err);
+
+      if (err instanceof Error) {
+        // Only show error message if it's not related to user cancellation
+        if (!err.message.includes("cancelled")) {
+          displayToast(`Failed to save file: ${err.message}`);
+        }
+      }
+    }
+  };
+
+  const handleSave = async () => {
+    if (validateInputValues() === false) {
+      return;
+    }
+    try {
+      // If Save As New
+      if (openFilePath.trim() === "") {
+        handleSaveAsNew();
+      } else {
+        const formData = collectFormData();
+        console.log("Saving to existing file path:", formData);
+
+        // Check if file exists
+        const fileInfo = await FileSystem.getInfoAsync(openFilePath);
+        if (!fileInfo.exists) {
+          console.log("File does not exist:", openFilePath);
+          return false;
+        }
+
+        await FileSystem.writeAsStringAsync(openFilePath, formData, {
+          encoding: FileSystem.EncodingType.UTF8,
+        });
+
+        // Verify the write was successful by reading back the file
+        const verifyContent = await FileSystem.readAsStringAsync(openFilePath, {
+          encoding: FileSystem.EncodingType.UTF8,
+        });
+
+        if (verifyContent === formData) {
+          displayToast("File saved successfully");
+        } else {
+          throw new Error("File verification failed");
+        }
+      }
+    } catch (error) {
+      console.error("Error saving file:", error);
+      displayToast("Failed to save file");
+    }
+  };
+
+  const handleSaveAsNew = async () => {
+    if (validateInputValues() === false) {
+      return;
+    }
+    // setOpenFileName(tmpPatternName);
+    setShowSaveFileTitleEditorModal(true);
+    return;
+  };
   const handleExport = useCallback(() => {
     if (gCode.trim() === "" || gCode === "(G-Code will appear here)") {
-      setToastMessage("Please generate G-Code first");
-      setShowToast(true);
+      displayToast("Please generate G-Code first");
       return;
     }
 
-    if (patternName.trim() === "") {
-      setTmpPatternName(""); // Reset temp name before showing modal
-      setShowTitleEditor(true);
-      return;
-    }
+    setShowExportFileTitleEditorModal(true);
+    // if (patternName.trim() === "") {
+    //   setTmpPatternName(""); // Reset temp name before showing modal
+    //   return;
+    // }
 
-    pickFolderAndSave(gCode, patternName + "_gcode");
+    // pickFolderAndSave(gCode, patternName + "_gcode");
   }, [
     gCode,
     patternName,
     setToastMessage,
     setShowToast,
-    setTmpPatternName,
-    setShowTitleEditor,
+    setTmpOpenFileName,
+    setShowExportFileTitleEditorModal,
   ]);
 
-  const handleGenerate = () => {
-    // Check shell tab fields
+  const validateInputValues = () => {
     const shellFields = [
       { value: shellSize, name: "Shell Size" },
       { value: measSize, name: "Measured Size" },
@@ -319,16 +386,20 @@ export default function Index() {
       (field) => !utils.isNumeric(field.value)
     );
     if (emptyField) {
-      setToastMessage(`Please enter ${emptyField.name}`);
-      setShowToast(true);
-      return;
+      displayToast(`Please enter a numeric ${emptyField.name}`);
+      return false;
     }
 
     // Check shell description
     if (shellDescription.trim() === "") {
-      setToastMessage("Please enter Shell Description");
-      setShowToast(true);
-      return;
+      displayToast("Please enter Shell Description");
+      return false;
+    }
+
+    // Check pattern name
+    if (patternName.trim() === "") {
+      displayToast("Please enter Pattern Name");
+      return false;
     }
 
     // Check burnish fields if enabled
@@ -344,25 +415,30 @@ export default function Index() {
         (field) => !utils.isNumeric(field.value)
       );
       if (emptyBurnishField) {
-        setToastMessage(`Please enter ${emptyBurnishField.name}`);
-        setShowToast(true);
-        return;
+        displayToast(`Please enter ${emptyBurnishField.name}`);
+        return false;
       }
     }
 
     // Check pump fields if enabled
     if (isEnablePump) {
       if (!utils.isNumeric(cycPerShell) || !utils.isNumeric(duration)) {
-        setToastMessage("Please enter Pump Cycles and Duration");
-        setShowToast(true);
-        return;
+        displayToast("Please enter Pump Cycles and Duration");
+        return false;
       }
 
       if (utils.isEmpty(pumpOnCode) || utils.isEmpty(pumpOffCode)) {
-        setToastMessage("Please enter Pump On/Off codes");
-        setShowToast(true);
-        return;
+        displayToast("Please enter Pump On/Off codes");
+        return false;
       }
+    }
+    return true;
+  };
+
+  const handleGenerate = () => {
+    // Check shell tab fields
+    if (validateInputValues() === false) {
+      return;
     }
 
     // Shell Size variables
@@ -420,8 +496,7 @@ export default function Index() {
     setTapeFeet(mainGCode.estTapeFeet.toString());
     setGCode(mainGCode.entireGCode);
     // Success message after generation
-    setToastMessage("G-Code generated successfully");
-    setShowToast(true);
+    displayToast("G-Code generated successfully");
   };
 
   // Render active tab content
@@ -430,6 +505,8 @@ export default function Index() {
       case "SHELL":
         return (
           <ShellTabContent
+            patternName={patternName}
+            setPatternName={setPatternName}
             shellSize={shellSize}
             setShellSize={setShellSize}
             measSize={measSize}
@@ -499,29 +576,38 @@ export default function Index() {
     }
   };
 
-  const handleTitleSave = useCallback(() => {
-    if (tmpPatternName.trim() !== "") {
-      setPatternName(tmpPatternName);
+  const handleSavingTitle = useCallback(() => {
+    if (tmpOpenFileName.trim() !== "") {
+      setOpenFileName(tmpOpenFileName);
     }
-    setShowTitleEditor(false);
-  }, [tmpPatternName]);
+    setShowSaveFileTitleEditorModal(false);
 
+    const formData = collectFormData();
+    pickFolderAndSave(formData, tmpOpenFileName, true);
+  }, [tmpOpenFileName]);
+
+  const handleExportTitleSave = () => {
+    setShowExportFileTitleEditorModal(false);
+    pickFolderAndSave(gCode, tmpExportFileName, false);
+  };
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#003366" />
+      {/* <StatusBar barStyle="light-content" backgroundColor="#003366" /> */}
       {/* Header */}
-      <Header />
+      {/* <Header /> */}
 
       {/* Pattern Name Display */}
       <View style={styles.patternNameContainer}>
-        <Text style={styles.patternNameLabel}>Pattern Name:</Text>
-        <Text style={styles.patternNameValue}>{patternName || "Untitled"}</Text>
-        <TouchableOpacity
+        {/* <Text style={styles.patternNameLabel}>Pattern Name:</Text> */}
+        <Text style={styles.patternNameValue}>
+          {openFileName || "Untitled"}
+        </Text>
+        {/* <TouchableOpacity
           style={styles.editButton}
           onPress={() => setShowTitleEditor(true)}
         >
           <Ionicons name="pencil" size={18} color="#2980b9" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       {/* Tabs */}
@@ -539,16 +625,26 @@ export default function Index() {
       <GCodePreview gCode={gCode} />
 
       <TitleEditorModal
-        visible={showTitleEditor}
-        value={tmpPatternName}
-        // extensions={fileExtensions}
-        // selectedExtension={selectedExtension}
-        onChangeText={setTmpPatternName}
-        // onExtensionChange={setSelectedExtension}
-        onSave={handleTitleSave}
+        visible={showSaveFileTitleEditorModal}
+        value={tmpOpenFileName}
+        onChangeText={setTmpOpenFileName}
+        title="Enter Saving File Name"
+        onSave={handleSavingTitle}
         onCancel={() => {
-          setTmpPatternName(patternName);
-          setShowTitleEditor(false);
+          setTmpOpenFileName(openFileName);
+          setShowSaveFileTitleEditorModal(false);
+        }}
+      />
+
+      <TitleEditorModal
+        visible={showExportFileTitleEditorModal}
+        value={tmpExportFileName}
+        onChangeText={setTmpExportFileName}
+        title="Enter Export File Name(*.gcode, *.gco, *.tap)"
+        onSave={handleExportTitleSave}
+        onCancel={() => {
+          setTmpExportFileName("");
+          setShowExportFileTitleEditorModal(false);
         }}
       />
 
@@ -556,6 +652,7 @@ export default function Index() {
       <ActionButtons
         onLoad={handleLoad}
         onSave={handleSave}
+        onSaveAsNew={handleSaveAsNew}
         onExport={handleExport}
       />
       {/* Floating Action Button */}

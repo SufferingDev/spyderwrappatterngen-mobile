@@ -1,8 +1,7 @@
-import React, { useState }  from 'react';
-import { StyleSheet, View } from 'react-native';
-import Toggle from 'react-native-toggle-element';
-import Card from '../components/shared/Card';
-import InputField from '../components/shared/InputField';
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import Card from "../components/shared/Card";
+import InputField from "../components/shared/InputField";
 
 interface WrapTabProps {
   feedrate: string;
@@ -16,13 +15,13 @@ interface WrapTabProps {
 
   isEnableBurnish: boolean;
   setIsEnableBurnish: (value: boolean) => void;
-  burnishPcg: string,
+  burnishPcg: string;
   setBurnishPcg: (text: string) => void;
-  rampStep: string,
+  rampStep: string;
   setRampStep: (text: string) => void;
-  startSpeed: string,
+  startSpeed: string;
   setStartSpeed: (text: string) => void;
-  finalSpeed: string,
+  finalSpeed: string;
   setFinalSpeed: (text: string) => void;
 }
 
@@ -45,9 +44,8 @@ const WrapTab = ({
   startSpeed,
   setStartSpeed,
   finalSpeed,
-  setFinalSpeed
+  setFinalSpeed,
 }: WrapTabProps) => {
-
   const handleToggleChange = (enabled: boolean) => {
     setIsEnableBurnish(enabled); // Update the parent state
   };
@@ -56,50 +54,51 @@ const WrapTab = ({
     <View>
       <Card title="Wrap Speed Variables">
         <View style={styles.inputRow}>
-          <InputField 
-            label="Feedrate" 
-            value={feedrate} 
+          <InputField
+            label="Feedrate"
+            value={feedrate}
             onChangeText={setFeedrate}
-            validateType='float'
+            validateType="float"
             minValue={0}
             required={true}
           />
-          <InputField 
-            label="Overwrap%" 
-            value={overwrap} 
+          <InputField
+            label="Overwrap%"
+            value={overwrap}
             onChangeText={setOverwrap}
-            validateType='float'
+            validateType="float"
             minValue={0}
             required={true}
           />
         </View>
 
         <View style={styles.inputRow}>
-          <InputField 
-            label="Total Layers" 
-            value={totalLayers} 
+          <InputField
+            label="Total Layers"
+            value={totalLayers}
             onChangeText={setTotalLayers}
-            validateType='float'
+            validateType="float"
             minValue={0}
             required={true}
           />
-          <InputField 
-            label="Per Layer" 
-            value={perLayer} 
+          <InputField
+            label="Per Layer"
+            value={perLayer}
             onChangeText={setPerLayer}
-            validateType='float'
+            validateType="float"
             minValue={0}
             required={true}
           />
         </View>
       </Card>
 
-      <Card title="Burnish Variables"
-        showToggle={true} 
+      <Card
+        title="Burnish Variables"
+        showToggle={true}
         initialEnabled={isEnableBurnish}
         onToggleChange={handleToggleChange}
-        >
-      {/* <Toggle
+      >
+        {/* <Toggle
         value={isToggled}
         onPress={() => setIsToggled(!isToggled)}
         trackBar={{
@@ -117,63 +116,62 @@ const WrapTab = ({
           inActiveBackgroundColor: 'blue',
         }}
       /> */}
-      {/* <Text style={styles.status}>
+        {/* <Text style={styles.status}>
         {isToggled ? 'Switch is ON' : 'Switch is OFF'}
       </Text> */}
         <View style={styles.inputRow}>
-          <InputField 
-            label="Burnish %"  
-            value={burnishPcg} 
+          <InputField
+            label="Burnish %"
+            value={burnishPcg}
             onChangeText={setBurnishPcg}
-            validateType='float'
+            validateType="float"
             minValue={0}
             editable={isEnableBurnish}
           />
-          <InputField 
-            label="Ramp Steps" 
-            value={rampStep} 
+          <InputField
+            label="Ramp Steps"
+            value={rampStep}
             onChangeText={setRampStep}
-            validateType='float'
+            validateType="float"
             minValue={0}
             editable={isEnableBurnish}
           />
         </View>
 
         <View style={styles.inputRow}>
-          <InputField 
-            label="Start Speed" 
-            value={startSpeed} 
+          <InputField
+            label="Start Speed"
+            value={startSpeed}
             onChangeText={setStartSpeed}
-            validateType='float'
+            validateType="float"
             minValue={0}
             editable={isEnableBurnish}
           />
-          <InputField 
-            label="Final Speed" 
-            value={finalSpeed} 
+          <InputField
+            label="Final Speed"
+            value={finalSpeed}
             onChangeText={setFinalSpeed}
-            validateType='float'
+            validateType="float"
             minValue={0}
             editable={isEnableBurnish}
           />
         </View>
       </Card>
     </View>
-    
   );
 };
 
 const styles = StyleSheet.create({
   inputRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 12,
   },
 
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
   label: {
     fontSize: 18,
@@ -182,7 +180,7 @@ const styles = StyleSheet.create({
   status: {
     marginTop: 20,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
 });
 

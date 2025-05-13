@@ -87,3 +87,14 @@ export const isNumeric = (input: string): boolean => {
 export const hasEmptyInputs = (inputs: string[]): boolean => {
     return inputs.some(element => !isNumeric(element));
 };
+
+export const getFileName = (uri: string): string => {
+    // Remove query parameters if any
+    const cleanUri = uri.split('?')[0];
+
+    // Get the last part after the last slash
+    const fileName = cleanUri.split('/').pop();
+
+    // Decode URI components if needed
+    return fileName ? decodeURIComponent(fileName) : '';
+}
