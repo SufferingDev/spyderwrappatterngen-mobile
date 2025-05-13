@@ -580,16 +580,28 @@ export default function Index() {
     if (tmpOpenFileName.trim() !== "") {
       setOpenFileName(tmpOpenFileName);
     }
-    setShowSaveFileTitleEditorModal(false);
 
+    if (utils.getFileExtension(tmpOpenFileName) !== "mum") {
+      displayToast("Please use .mum file extension");
+      return;
+    }
+    setShowSaveFileTitleEditorModal(false);
     const formData = collectFormData();
     pickFolderAndSave(formData, tmpOpenFileName, true);
   }, [tmpOpenFileName]);
 
   const handleExportTitleSave = () => {
+    const ext = utils.getFileExtension(tmpExportFileName);
+    const validExtensions = ["tap", "gcode", "gco"];
+
+    if (!validExtensions.includes(ext)) {
+      displayToast("Please use .tap, .gcode or .gco file extension");
+      return;
+    }
     setShowExportFileTitleEditorModal(false);
     pickFolderAndSave(gCode, tmpExportFileName, false);
   };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* <StatusBar barStyle="light-content" backgroundColor="#003366" /> */}
@@ -616,11 +628,6 @@ export default function Index() {
         {/* Render content based on active tab */}
         {renderActiveTabContent()}
       </ScrollView>
-      <Toast
-        message={toastMessage}
-        visible={showToast}
-        onHide={() => setShowToast(false)}
-      />
       {/* G-Code Preview - shown on all tabs */}
       <GCodePreview gCode={gCode} />
 
@@ -646,6 +653,12 @@ export default function Index() {
           setTmpExportFileName("");
           setShowExportFileTitleEditorModal(false);
         }}
+      />
+
+      <Toast
+        message={toastMessage}
+        visible={showToast}
+        onHide={() => setShowToast(false)}
       />
 
       {/* Bottom Buttons */}

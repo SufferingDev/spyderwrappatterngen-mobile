@@ -98,3 +98,17 @@ export const getFileName = (uri: string): string => {
     // Decode URI components if needed
     return fileName ? decodeURIComponent(fileName) : '';
 }
+
+export const getFileExtension = (filename: string): string => {
+  // Handle empty or invalid filenames
+  if (!filename) return '';
+  
+  // Split by dots and get the last part
+  const parts = filename.split('.');
+  
+  // If no dots or only one character after dot, return empty
+  if (parts.length <= 1) return '';
+  
+  // Return the last part as extension
+  return parts[parts.length - 1].toLowerCase();
+};
