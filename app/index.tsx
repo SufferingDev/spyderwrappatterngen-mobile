@@ -581,10 +581,10 @@ export default function Index() {
       setOpenFileName(tmpOpenFileName);
     }
 
-    if (utils.getFileExtension(tmpOpenFileName) !== "mum") {
-      displayToast("Please use .mum file extension");
-      return;
-    }
+    // if (utils.getFileExtension(tmpOpenFileName) !== "mum") {
+    //   displayToast("Please use .mum file extension");
+    //   return;
+    // }
     setShowSaveFileTitleEditorModal(false);
     const formData = collectFormData();
     pickFolderAndSave(formData, tmpOpenFileName, true);
