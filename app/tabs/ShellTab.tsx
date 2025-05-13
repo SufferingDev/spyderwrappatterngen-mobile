@@ -1,9 +1,11 @@
-import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import Card from '../components/shared/Card';
-import InputField from '../components/shared/InputField';
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import Card from "../components/shared/Card";
+import InputField from "../components/shared/InputField";
 
 interface ShellTabProps {
+  patternName: string;
+  setPatternName: (text: string) => void;
   shellSize: string;
   setShellSize: (text: string) => void;
   measSize: string;
@@ -25,6 +27,8 @@ interface ShellTabProps {
 }
 
 const ShellTab = ({
+  patternName,
+  setPatternName,
   shellSize,
   setShellSize,
   measSize,
@@ -42,25 +46,35 @@ const ShellTab = ({
   TapeFeet,
   setTapeFeet,
   shellDescription,
-  setShellDescription
+  setShellDescription,
 }: ShellTabProps) => {
   return (
     <Card title="Shell Size Variables">
       <View style={styles.inputRow}>
         <InputField
+          label="Pattern Name"
+          value={patternName}
+          onChangeText={setPatternName}
+          fullWidth={true}
+          required={true}
+        />
+      </View>
+
+      <View style={styles.inputRow}>
+        <InputField
           label="Shell Size"
           value={shellSize}
           onChangeText={setShellSize}
-          validateType='float'
+          validateType="float"
           minValue={0}
-          keyboardType='numeric'
+          keyboardType="numeric"
           required={true}
         />
         <InputField
           label="Meas size"
           value={measSize}
           onChangeText={setMeasSize}
-          validateType='float'
+          validateType="float"
           minValue={0}
           required={true}
         />
@@ -71,7 +85,7 @@ const ShellTab = ({
           label="Diameter%"
           value={diameter}
           onChangeText={setDiameter}
-          validateType='float'
+          validateType="float"
           minValue={0}
           required={true}
         />
@@ -79,7 +93,7 @@ const ShellTab = ({
           label="Circ+"
           value={circ}
           onChangeText={setCirc}
-          validateType='float'
+          validateType="float"
           minValue={0}
           required={true}
         />
@@ -90,7 +104,7 @@ const ShellTab = ({
           label="Yaxis%"
           value={yaixs}
           onChangeText={setYaixs}
-          validateType='float'
+          validateType="float"
           minValue={0}
           required={true}
         />
@@ -98,7 +112,7 @@ const ShellTab = ({
           label="Total Kick"
           value={totalKick}
           onChangeText={setTotalKick}
-          validateType='float'
+          validateType="float"
           minValue={0}
           required={true}
         />
@@ -109,7 +123,7 @@ const ShellTab = ({
           label="Kick Ratio%"
           value={kickRatio}
           onChangeText={setKickRatio}
-          validateType='float'
+          validateType="float"
           minValue={0}
           required={true}
         />
@@ -121,14 +135,8 @@ const ShellTab = ({
         /> */}
 
         <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>
-            Tape Feet
-          </Text>
-          <Text
-            style={styles.input}
-          >
-            {TapeFeet}
-          </Text>
+          <Text style={styles.inputLabel}>Tape Feet</Text>
+          <Text style={styles.input}>{TapeFeet}</Text>
         </View>
       </View>
 
@@ -147,7 +155,7 @@ const ShellTab = ({
 
 const styles = StyleSheet.create({
   inputRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 12,
   },
   inputGroup: {
@@ -158,16 +166,16 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: 'white',
+    borderColor: "white",
     borderRadius: 4,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     paddingHorizontal: 10,
     paddingVertical: 8,
     fontSize: 14,
   },
   inputLabel: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 4,
   },
 });

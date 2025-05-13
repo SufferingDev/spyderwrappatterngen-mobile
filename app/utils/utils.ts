@@ -71,17 +71,44 @@ export const replacevariables = (
     });
 }
 
-function isNumeric(input: string): boolean {
-    return /^\d+$/.test(input);
+export const isEmpty = (input: string): boolean => {
+    return input === undefined || input === null || input.trim() === '';
+};
+
+export const isNumeric = (input: string): boolean => {
+    // This regex pattern accepts:
+    // - Whole numbers
+    // - Decimal numbers
+    // - No negative numbers
+    // - Prevents multiple dots
+    return /^\d*\.?\d+$/.test(input);
 }
 
 export const hasEmptyInputs = (inputs: string[]): boolean => {
-// return inputs.some(value => !value || value.trim() === '');
-    // inputs.map((value) => {
-    //     console.log(value, isNumeric(value));
-    //     if (!isNumeric(value))
-    //         return false;
-    // })
-    // return true;
     return inputs.some(element => !isNumeric(element));
+};
+
+export const getFileName = (uri: string): string => {
+    // Remove query parameters if any
+    const cleanUri = uri.split('?')[0];
+
+    // Get the last part after the last slash
+    const fileName = cleanUri.split('/').pop();
+
+    // Decode URI components if needed
+    return fileName ? decodeURIComponent(fileName) : '';
+}
+
+export const getFileExtension = (filename: string): string => {
+  // Handle empty or invalid filenames
+  if (!filename) return '';
+  
+  // Split by dots and get the last part
+  const parts = filename.split('.');
+  
+  // If no dots or only one character after dot, return empty
+  if (parts.length <= 1) return '';
+  
+  // Return the last part as extension
+  return parts[parts.length - 1].toLowerCase();
 };
