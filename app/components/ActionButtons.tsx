@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -17,23 +18,27 @@ const ActionButtons = ({
   onExport,
 }: ActionButtonsProps) => {
   return (
-    <View style={styles.buttonRow}>
+    <View style={styles.container}>
       <TouchableOpacity style={styles.button} onPress={onLoad}>
+        <Ionicons name="arrow-down" size={20} color="#333" />
         <Text style={styles.buttonText}>LOAD</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={onSave}>
-        <Text style={styles.buttonText}>SAVE</Text>
+
+      <TouchableOpacity
+        style={[styles.button, styles.saveButton]}
+        onPress={onSave}
+      >
+        <Ionicons name="save" size={20} color="#fff" />
+        <Text style={[styles.buttonText, styles.saveButtonText]}>SAVE</Text>
       </TouchableOpacity>
-      {/* <TouchableOpacity style={[styles.button, styles.generateButton]} onPress={onGenerate}>
-        <Text style={[styles.buttonText, styles.generateButtonText]}>SAVE AS NEW</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={onExport}>
-        <Text style={styles.buttonText}>EXPORT</Text>
-      </TouchableOpacity> */}
+
       <TouchableOpacity style={styles.button} onPress={onSaveAsNew}>
-        <Text style={styles.buttonText}>SAVE AS NEW</Text>
+        <Ionicons name="add" size={20} color="#333" />
+        <Text style={styles.buttonText}>NEW SAVE</Text>
       </TouchableOpacity>
+
       <TouchableOpacity style={styles.button} onPress={onExport}>
+        <Ionicons name="arrow-up" size={20} color="#333" />
         <Text style={styles.buttonText}>EXPORT</Text>
       </TouchableOpacity>
     </View>
@@ -41,30 +46,32 @@ const ActionButtons = ({
 };
 
 const styles = StyleSheet.create({
-  buttonRow: {
+  container: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 16,
+    justifyContent: "space-around",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    paddingVertical: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
   },
   button: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 4,
-    backgroundColor: "#f0f4f8",
-    justifyContent: "center",
     alignItems: "center",
-    flex: 1,
-    marginHorizontal: 4,
+    justifyContent: "center",
+    padding: 8,
+  },
+  saveButton: {
+    backgroundColor: "#2196F3",
+    borderRadius: 4,
+    paddingHorizontal: 16,
   },
   buttonText: {
-    color: "#666",
-    fontWeight: "500",
+    fontSize: 12,
+    color: "#333",
+    marginTop: 4,
   },
-  generateButton: {
-    backgroundColor: "#2980b9",
-  },
-  generateButtonText: {
-    color: "white",
+  saveButtonText: {
+    color: "#fff",
   },
 });
 

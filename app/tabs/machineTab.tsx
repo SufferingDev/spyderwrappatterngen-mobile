@@ -1,26 +1,26 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import Card from '../components/shared/Card';
-import InputField from '../components/shared/InputField';
-import AreaField from '../components/shared/AreaField';
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import AreaField from "../components/shared/AreaField";
+import Card from "../components/shared/Card";
+import InputField from "../components/shared/InputField";
 
 interface MachineTabProps {
   isEnablePump: boolean;
   setIsEnablePump: (value: boolean) => void;
   pumpOnCode: string;
-  setPumpOnCode: (text: string) => void;  
+  setPumpOnCode: (text: string) => void;
   pumpOffCode: string;
   setPumpOffCode: (text: string) => void;
-  cycPerShell: string,
+  cycPerShell: string;
   setCycPerShell: (text: string) => void;
-  duration: string,
+  duration: string;
   setDuration: (text: string) => void;
 
-  startupGCode: string,
+  startupGCode: string;
   setStartupGCode: (text: string) => void;
-  endOfMainWrap: string,
+  endOfMainWrap: string;
   setEndOfMainWrap: (text: string) => void;
-  endOfCompleteWrap: string,
+  endOfCompleteWrap: string;
   setEndOfCompleteWrap: (text: string) => void;
 }
 
@@ -40,19 +40,20 @@ const MachineTab = ({
   endOfMainWrap,
   setEndOfMainWrap,
   endOfCompleteWrap,
-  setEndOfCompleteWrap
+  setEndOfCompleteWrap,
 }: MachineTabProps) => {
-
-  const handleToggleChange = (enabled: boolean) : void => {
+  const handleToggleChange = (enabled: boolean): void => {
     setIsEnablePump(enabled); // Update the parent state
-  }
+  };
 
   return (
     <View>
-      <Card title="Pump Variables"
-        showToggle={true} 
+      <Card
+        title="Pump Variables"
+        showToggle={true}
         initialEnabled={isEnablePump}
-        onToggleChange={handleToggleChange}>
+        onToggleChange={handleToggleChange}
+      >
         <View style={styles.inputRow}>
           <InputField
             label="Pump on Code"
@@ -72,7 +73,7 @@ const MachineTab = ({
             label="Cycles per Shell"
             value={cycPerShell}
             onChangeText={setCycPerShell}
-            validateType='float'
+            validateType="float"
             minValue={0}
             editable={isEnablePump}
           />
@@ -80,7 +81,7 @@ const MachineTab = ({
             label="Duration"
             value={duration}
             onChangeText={setDuration}
-            validateType='float'
+            validateType="float"
             minValue={0}
             editable={isEnablePump}
           />
@@ -116,8 +117,8 @@ const MachineTab = ({
 
 const styles = StyleSheet.create({
   inputRow: {
-    flexDirection: 'row',
-    marginBottom: 12,
+    flexDirection: "row",
+    marginBottom: 4,
   },
 });
 

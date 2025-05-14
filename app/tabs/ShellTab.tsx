@@ -156,7 +156,7 @@ const ShellTab = ({
 const styles = StyleSheet.create({
   inputRow: {
     flexDirection: "row",
-    marginBottom: 12,
+    marginBottom: 4,
   },
   inputGroup: {
     flex: 1,

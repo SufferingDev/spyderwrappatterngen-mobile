@@ -4,23 +4,23 @@ import * as FileSystem from "expo-file-system";
 import React, { useCallback, useState } from "react";
 import {
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import Toast from "./components/NotificationToast";
 import TitleEditorModal from "./components/shared/TitleEditorModal";
 
 // Component imports
 import ActionButtons from "./components/ActionButtons";
-import GCodePreview from "./components/GCodePreview";
 import TabBar from "./components/TabBar";
 
 // Tab content components
+import GCodePreview from "./components/GCodePreview";
 import ShellTabContent from "./tabs/ShellTab";
 import WrapTabContent from "./tabs/WrapTab";
 import MachineTapContent from "./tabs/machineTab";
@@ -241,7 +241,7 @@ export default function Index() {
               );
 
             setOpenFilePath(fileUri);
-            setOpenFileName(fileName);
+            setOpenFileName(fileName + ".mum");
             await FileSystem.writeAsStringAsync(fileUri, content);
             displayToast(`File saved successfully as ${fileName}.mum`);
           } else {
@@ -386,7 +386,7 @@ export default function Index() {
       (field) => !utils.isNumeric(field.value)
     );
     if (emptyField) {
-      displayToast(`Please enter a numeric ${emptyField.name}`);
+      displayToast(`Please enter a positive numeric ${emptyField.name}`);
       return false;
     }
 
@@ -578,7 +578,7 @@ export default function Index() {
 
   const handleSavingTitle = useCallback(() => {
     if (tmpOpenFileName.trim() !== "") {
-      setOpenFileName(tmpOpenFileName);
+      setOpenFileName(tmpOpenFileName + ".mum");
     }
 
     // if (utils.getFileExtension(tmpOpenFileName) !== "mum") {

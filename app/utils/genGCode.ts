@@ -176,6 +176,11 @@ export const genMainGCode = (
         variables["pattern_Name"] = openedFilePath ? Path.basename(openedFilePath) : StrPatternName.value;
         */
         variables["Pattern_Name"] = strPatternName;
+        variables["pattern_name"] = strPatternName;
+        variables["Pattern_name"] = strPatternName;
+        variables["pattern_Name"] = strPatternName;
+        variables["PATTERN_NAME"] = strPatternName;
+        variables["PatternName"] = strPatternName;
 
         variables["End_of_Main_Wrap"] = strEndMainWrap;
         variables["end_of_main_wrap"] = strEndMainWrap;
@@ -267,7 +272,7 @@ console.log(numBurnishPcg, burnishLayerCount);
     }
 
     // Add End of Completed Wrap
-    gcodeOutput += replaceVariables(strEndComWrap);
+    gcodeOutput += replaceVariables(strEndComWrap) + "\n";
 
     estTapeFeet = parseFloat(estTapeFeet.toFixed(3));
     // // Set the final output text at once

@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface TabBarProps {
   activeTab: string;
@@ -9,11 +9,15 @@ interface TabBarProps {
 const TabBar = ({ activeTab, setActiveTab }: TabBarProps) => {
   const renderTab = (name: string) => {
     return (
-      <TouchableOpacity 
-        style={[styles.tab, activeTab === name && styles.activeTab]} 
+      <TouchableOpacity
+        style={[styles.tab, activeTab === name && styles.activeTab]}
         onPress={() => setActiveTab(name)}
       >
-        <Text style={[styles.tabText, activeTab === name && styles.activeTabText]}>{name}</Text>
+        <Text
+          style={[styles.tabText, activeTab === name && styles.activeTabText]}
+        >
+          {name}
+        </Text>
         {activeTab === name && <View style={styles.activeIndicator} />}
       </TouchableOpacity>
     );
@@ -21,13 +25,13 @@ const TabBar = ({ activeTab, setActiveTab }: TabBarProps) => {
 
   return (
     <View style={styles.tabContainer}>
-      {renderTab('SHELL')}
-      {renderTab('WRAP')}
-      {renderTab('BURNISH')}
+      {renderTab("SHELL")}
+      {renderTab("WRAP")}
+      {renderTab("BURNISH")}
     </View>
   );
 };
-
+/*
 const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: 'row',
@@ -57,6 +61,34 @@ const styles = StyleSheet.create({
     right: 0,
     height: 3,
     backgroundColor: '#2980b9',
+  },
+});
+*/
+
+const styles = StyleSheet.create({
+  tabContainer: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  activeTab: {
+    backgroundColor: "#2980b9",
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#666",
+  },
+  activeTabText: {
+    color: "#fff",
+    fontWeight: "600",
   },
 });
 
