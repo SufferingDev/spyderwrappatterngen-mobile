@@ -241,7 +241,7 @@ export default function Index() {
               );
 
             setOpenFilePath(fileUri);
-            setOpenFileName(fileName);
+            setOpenFileName(fileName + ".mum");
             await FileSystem.writeAsStringAsync(fileUri, content);
             displayToast(`File saved successfully as ${fileName}.mum`);
           } else {
@@ -386,7 +386,7 @@ export default function Index() {
       (field) => !utils.isNumeric(field.value)
     );
     if (emptyField) {
-      displayToast(`Please enter a numeric ${emptyField.name}`);
+      displayToast(`Please enter a positive numeric ${emptyField.name}`);
       return false;
     }
 
@@ -578,7 +578,7 @@ export default function Index() {
 
   const handleSavingTitle = useCallback(() => {
     if (tmpOpenFileName.trim() !== "") {
-      setOpenFileName(tmpOpenFileName);
+      setOpenFileName(tmpOpenFileName + ".mum");
     }
 
     // if (utils.getFileExtension(tmpOpenFileName) !== "mum") {

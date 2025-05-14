@@ -144,11 +144,8 @@ export default Card;
 
 */
 
-
-
-
-import React, { ReactNode, useState, Children, cloneElement, isValidElement } from 'react';
-import { StyleSheet, Text, View, Switch } from 'react-native';
+import React, { ReactNode, useState } from "react";
+import { StyleSheet, Switch, Text, View } from "react-native";
 
 interface CardProps {
   title: string;
@@ -158,12 +155,12 @@ interface CardProps {
   onToggleChange?: (enabled: boolean) => void;
 }
 
-const Card = ({ 
-  title, 
-  children, 
-  showToggle = false, 
+const Card = ({
+  title,
+  children,
+  showToggle = false,
   initialEnabled = true,
-  onToggleChange 
+  onToggleChange,
 }: CardProps) => {
   const [enabled, setEnabled] = useState(initialEnabled);
 
@@ -173,7 +170,7 @@ const Card = ({
       onToggleChange(value);
     }
   };
-/*
+  /*
   // Function to recursively disable/enable all InputField components
   const modifyChildrenState = (children: ReactNode): ReactNode => {
     return Children.map(children, child => {
@@ -213,8 +210,8 @@ const Card = ({
           <Switch
             value={enabled}
             onValueChange={handleToggleChange}
-            trackColor={{ false: '#D3D3D3', true: '#81b0ff' }}
-            thumbColor={enabled ? '#4682B4' : '#f4f3f4'}
+            trackColor={{ false: "#D3D3D3", true: "#81b0ff" }}
+            thumbColor={enabled ? "#4682B4" : "#f4f3f4"}
           />
         )}
       </View>
@@ -225,26 +222,26 @@ const Card = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 8,
     padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
 });
 
