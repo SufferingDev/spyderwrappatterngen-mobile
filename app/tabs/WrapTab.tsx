@@ -164,7 +164,7 @@ const WrapTab = ({
 const styles = StyleSheet.create({
   inputRow: {
     flexDirection: "row",
-    marginBottom: 12,
+    marginBottom: 4,
   },
 
   container: {

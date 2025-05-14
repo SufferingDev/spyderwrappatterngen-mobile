@@ -54,20 +54,17 @@ const styles = StyleSheet.create({
 export default InputField;
 */
 
-
-
-
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput } from 'react-native';
+import React, { useState } from "react";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 interface InputFieldProps {
   label: string;
   value: string;
   onChangeText: (text: string) => void;
-  keyboardType?: 'default' | 'numeric' | 'email-address' | 'phone-pad';
+  keyboardType?: "default" | "numeric" | "email-address" | "phone-pad";
   fullWidth?: boolean;
   required?: boolean;
-  validateType?: 'none' | 'integer' | 'float';
+  validateType?: "none" | "integer" | "float";
   minValue?: number;
   maxValue?: number;
   onValidationChange?: (isValid: boolean) => void;
@@ -78,39 +75,39 @@ const InputField = ({
   label,
   value,
   onChangeText,
-  keyboardType = 'default',
+  keyboardType = "default",
   fullWidth = false,
   required = false,
-  validateType = 'none',
+  validateType = "none",
   minValue,
   maxValue,
   onValidationChange,
   editable = true,
 }: InputFieldProps) => {
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
   const [touched, setTouched] = useState<boolean>(false);
 
   // Validation function
   const validate = (text: string): boolean => {
-    if (required && text.trim() === '') {
+    if (required && text.trim() === "") {
       setError(`${label} is required`);
       return false;
     }
 
     // If not required and empty, it's valid
-    if (!required && text.trim() === '') {
-      setError('');
+    if (!required && text.trim() === "") {
+      setError("");
       return true;
     }
 
     switch (validateType) {
-      case 'integer':
+      case "integer":
         // Check if it's a valid integer
         if (!/^-?\d+$/.test(text)) {
-          setError('Please enter a valid integer');
+          setError("Please enter a valid integer");
           return false;
         }
-        
+
         const intValue = parseInt(text, 10);
         if (minValue !== undefined && intValue < minValue) {
           setError(`Value must be at least ${minValue}`);
@@ -121,14 +118,14 @@ const InputField = ({
           return false;
         }
         break;
-      
-      case 'float':
+
+      case "float":
         // Check if it's a valid float
         if (!/^-?\d*\.?\d+$/.test(text)) {
-          setError('Please enter a valid number');
+          setError("Please enter a valid number");
           return false;
         }
-        
+
         const floatValue = parseFloat(text);
         if (minValue !== undefined && floatValue < minValue) {
           setError(`Value must be at least ${minValue}`);
@@ -139,20 +136,20 @@ const InputField = ({
           return false;
         }
         break;
-      
+
       default:
         // No validation for default type
         break;
     }
 
-    setError('');
+    setError("");
     return true;
   };
 
   // Handle text change with validation
   const handleChangeText = (text: string) => {
     onChangeText(text);
-    
+
     if (touched) {
       const isValid = validate(text);
       if (onValidationChange) {
@@ -172,8 +169,8 @@ const InputField = ({
 
   // Determine keyboard type based on validation type
   const getKeyboardType = () => {
-    if (validateType === 'integer' || validateType === 'float') {
-      return 'numeric';
+    if (validateType === "integer" || validateType === "float") {
+      return "numeric";
     }
     return keyboardType;
   };
@@ -181,7 +178,8 @@ const InputField = ({
   return (
     <View style={fullWidth ? styles.fullWidthInput : styles.inputGroup}>
       <Text style={styles.inputLabel}>
-        {label}{required ? <Text style={styles.requiredStar}>*</Text> : null}
+        {label}
+        {required ? <Text style={styles.requiredStar}>*</Text> : null}
       </Text>
       <TextInput
         style={[styles.input, error ? styles.inputError : null]}
@@ -210,29 +208,29 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   inputLabel: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 13,
+    color: "#666",
     marginBottom: 4,
   },
   requiredStar: {
-    color: '#e53935',
+    color: "#e53935",
     marginLeft: 2,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 4,
-    backgroundColor: '#f5f8fa',
+    backgroundColor: "#f5f8fa",
     paddingHorizontal: 10,
     paddingVertical: 8,
-    fontSize: 14,
+    fontSize: 13,
   },
   inputError: {
-    borderColor: '#e53935',
-    backgroundColor: '#ffebee',
+    borderColor: "#e53935",
+    backgroundColor: "#ffebee",
   },
   errorText: {
-    color: '#e53935',
+    color: "#e53935",
     fontSize: 12,
     marginTop: 4,
   },

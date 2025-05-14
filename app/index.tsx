@@ -4,23 +4,23 @@ import * as FileSystem from "expo-file-system";
 import React, { useCallback, useState } from "react";
 import {
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import Toast from "./components/NotificationToast";
 import TitleEditorModal from "./components/shared/TitleEditorModal";
 
 // Component imports
 import ActionButtons from "./components/ActionButtons";
-import GCodePreview from "./components/GCodePreview";
 import TabBar from "./components/TabBar";
 
 // Tab content components
+import GCodePreview from "./components/GCodePreview";
 import ShellTabContent from "./tabs/ShellTab";
 import WrapTabContent from "./tabs/WrapTab";
 import MachineTapContent from "./tabs/machineTab";
