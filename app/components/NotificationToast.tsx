@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect } from "react";
+import { Animated, StyleSheet, Text, View } from "react-native";
 
 const Toast = ({ message, visible, onHide }) => {
   const opacity = new Animated.Value(0);
@@ -40,20 +40,20 @@ const Toast = ({ message, visible, onHide }) => {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
+    position: "absolute",
     marginTop: 100,
-    alignItems: 'center',
+    alignItems: "center",
     zIndex: 9999,
     elevation: 9999, // For Android
-    width: '100%',
-    pointerEvents: 'none', // Makes sure touches pass through to elements below
+    width: "100%",
+    pointerEvents: "none", // Makes sure touches pass through to elements below
   },
   toast: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 50,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -61,12 +61,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    maxWidth: '90%',
+    maxWidth: "90%",
   },
   text: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
+    textAlign: "center",
   },
 });
 
-export default Toast; 
+export default Toast;

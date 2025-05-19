@@ -126,7 +126,7 @@ const WrapTab = ({
             onChangeText={setBurnishPcg}
             validateType="float"
             minValue={0}
-            editable={isEnableBurnish}
+            // editable={isEnableBurnish}
           />
           <InputField
             label="Ramp Steps"

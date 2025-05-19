@@ -27,7 +27,7 @@ const TabBar = ({ activeTab, setActiveTab }: TabBarProps) => {
     <View style={styles.tabContainer}>
       {renderTab("SHELL")}
       {renderTab("WRAP")}
-      {renderTab("BURNISH")}
+      {renderTab("MACHINE")}
     </View>
   );
 };
