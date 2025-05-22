@@ -27,43 +27,10 @@ const TabBar = ({ activeTab, setActiveTab }: TabBarProps) => {
     <View style={styles.tabContainer}>
       {renderTab("SHELL")}
       {renderTab("WRAP")}
-      {renderTab("BURNISH")}
+      {renderTab("MACHINE")}
     </View>
   );
 };
-/*
-const styles = StyleSheet.create({
-  tabContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#e5eef7',
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 16,
-    alignItems: 'center',
-    position: 'relative',
-  },
-  activeTab: {
-    backgroundColor: '#e5eef7',
-  },
-  tabText: {
-    color: '#8c9db5',
-    fontWeight: '500',
-  },
-  activeTabText: {
-    color: '#2980b9',
-    fontWeight: 'bold',
-  },
-  activeIndicator: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 3,
-    backgroundColor: '#2980b9',
-  },
-});
-*/
 
 const styles = StyleSheet.create({
   tabContainer: {
@@ -79,7 +46,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   activeTab: {
-    backgroundColor: "#2980b9",
+    backgroundColor: "#2296F3",
   },
   tabText: {
     fontSize: 14,

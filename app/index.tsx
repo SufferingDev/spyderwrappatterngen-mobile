@@ -405,7 +405,7 @@ export default function Index() {
     // Check burnish fields if enabled
     if (isEnableBurnish) {
       const burnishFields = [
-        { value: burnishPcg, name: "Burnish Percentage" },
+        // { value: burnishPcg, name: "Burnish Percentage" },
         { value: rampStep, name: "Ramp Steps" },
         { value: startSpeed, name: "Start Speed" },
         { value: finalSpeed, name: "Final Speed" },
@@ -550,7 +550,7 @@ export default function Index() {
             setFinalSpeed={setFinalSpeed}
           />
         );
-      case "BURNISH":
+      case "MACHINE":
         return (
           <MachineTapContent
             isEnablePump={isEnablePump}
@@ -629,7 +629,7 @@ export default function Index() {
         {renderActiveTabContent()}
       </ScrollView>
       {/* G-Code Preview - shown on all tabs */}
-      <GCodePreview gCode={gCode} />
+      <GCodePreview gCode={gCode} tapeFeet={tapeFeet} />
 
       <TitleEditorModal
         visible={showSaveFileTitleEditorModal}

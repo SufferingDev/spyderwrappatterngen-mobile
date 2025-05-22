@@ -210,8 +210,8 @@ const Card = ({
           <Switch
             value={enabled}
             onValueChange={handleToggleChange}
-            trackColor={{ false: "#D3D3D3", true: "#81b0ff" }}
-            thumbColor={enabled ? "#4682B4" : "#f4f3f4"}
+            trackColor={{ false: "#D3D3D3", true: "#2296F3" }}
+            thumbColor={enabled ? "#2A80B9" : "#f4f3f4"}
           />
         )}
       </View>
