@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Card from "../components/shared/Card";
 import InputField from "../components/shared/InputField";
 
@@ -134,10 +134,10 @@ const ShellTab = ({
           keyboardType="numeric"
         /> */}
 
-        <View style={styles.inputGroup}>
+        {/* <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>Tape Feet</Text>
           <Text style={styles.input}>{TapeFeet}</Text>
-        </View>
+        </View> */}
       </View>
 
       <View style={styles.inputRow}>

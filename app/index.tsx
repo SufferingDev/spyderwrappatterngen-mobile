@@ -629,7 +629,7 @@ export default function Index() {
         {renderActiveTabContent()}
       </ScrollView>
       {/* G-Code Preview - shown on all tabs */}
-      <GCodePreview gCode={gCode} />
+      <GCodePreview gCode={gCode} tapeFeet={tapeFeet} />
 
       <TitleEditorModal
         visible={showSaveFileTitleEditorModal}
