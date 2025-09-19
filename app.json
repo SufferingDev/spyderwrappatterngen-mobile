@@ -1,21 +1,33 @@
 {
   "expo": {
-    "name": "spyder-wrap",
-    "slug": "spyder-wrap",
+    "name": "wrap-pattern",
+    "slug": "wrap-pattern",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "wrappattern",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+    "extra": {
+    "eas": {
+      "projectId": "e9c7026d-102a-40f3-95a9-05c02d1cfa51"
       }
+    },
+    "android": {
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/nano.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.shyboy1044.wrappattern"
     },
     "web": {
       "bundler": "metro",
@@ -27,8 +39,8 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
+          "image": "./assets/images/bg.png",
+          "imageWidth": 400,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
