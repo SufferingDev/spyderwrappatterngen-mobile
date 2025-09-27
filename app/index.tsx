@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Platform,
   ScrollView,
@@ -28,6 +28,24 @@ import MachineTapContent from "./tabs/machineTab";
 
 import genMainGCode from "./utils/genGCode";
 import * as utils from "./utils/utils";
+import {
+  MachinePresetData,
+  NamedPreset,
+  ShellWrapPresetData,
+  getMachinePresets,
+  getSelectedMachinePresetName,
+  getSelectedShellWrapPresetName,
+  getShellWrapPresets,
+  saveMachinePresets,
+  saveSelectedMachinePresetName,
+  saveSelectedShellWrapPresetName,
+  saveShellWrapPresets,
+} from "./utils/presetStorage";
+
+const sortPresets = <T,>(presets: NamedPreset<T>[]) =>
+  [...presets].sort((a, b) =>
+    a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+  );
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState("SHELL");
@@ -87,6 +105,23 @@ export default function Index() {
     "Please enter all the dependencies"
   );
 
+  const [shellWrapPresets, setShellWrapPresets] = useState<
+    NamedPreset<ShellWrapPresetData>[]
+  >([]);
+  const [selectedShellWrapPreset, setSelectedShellWrapPreset] = useState<
+    string | null
+  >(null);
+  const [machinePresets, setMachinePresets] = useState<
+    NamedPreset<MachinePresetData>[]
+  >([]);
+  const [selectedMachinePreset, setSelectedMachinePreset] = useState<
+    string | null
+  >(null);
+  const [showShellPresetModal, setShowShellPresetModal] = useState(false);
+  const [shellPresetNameInput, setShellPresetNameInput] = useState("");
+  const [showMachinePresetModal, setShowMachinePresetModal] = useState(false);
+  const [machinePresetNameInput, setMachinePresetNameInput] = useState("");
+
   // Add these state variables
   const [selectedExtension, setSelectedExtension] = useState(".mum");
   const fileExtensions = [".mum", ".gcode"]; // Add your extensions here
@@ -98,6 +133,366 @@ export default function Index() {
     },
     [setShowToast, setToastMessage]
   );
+
+  const applyShellWrapPreset = useCallback(
+    (preset: ShellWrapPresetData) => {
+      setPatternName(preset.patternName);
+      setShellSize(preset.shellSize);
+      setMeasSize(preset.measSize);
+      setDiameter(preset.diameter);
+      setCirc(preset.circ);
+      setYaixs(preset.yaixs);
+      setTotalKick(preset.totalKick);
+      setKickRatio(preset.kickRatio);
+      setTapeFeet(preset.tapeFeet);
+      setShellDescription(preset.shellDescription);
+      setFeedrate(preset.feedrate);
+      setOverwrap(preset.overwrap);
+      setTotalLayers(preset.totalLayers);
+      setPerLayer(preset.perLayer);
+      setIsEnableBurnish(preset.isEnableBurnish);
+      setBurnishPcg(preset.burnishPcg);
+      setRampStep(preset.rampStep);
+      setStartSpeed(preset.startSpeed);
+      setFinalSpeed(preset.finalSpeed);
+    },
+    [
+      setPatternName,
+      setShellSize,
+      setMeasSize,
+      setDiameter,
+      setCirc,
+      setYaixs,
+      setTotalKick,
+      setKickRatio,
+      setTapeFeet,
+      setShellDescription,
+      setFeedrate,
+      setOverwrap,
+      setTotalLayers,
+      setPerLayer,
+      setIsEnableBurnish,
+      setBurnishPcg,
+      setRampStep,
+      setStartSpeed,
+      setFinalSpeed,
+    ]
+  );
+
+  const applyMachinePreset = useCallback(
+    (preset: MachinePresetData) => {
+      setIsEnablePump(preset.isEnablePump);
+      setPumpOnCode(preset.pumpOnCode);
+      setPumpOffCode(preset.pumpOffCode);
+      setCycPerShell(preset.cycPerShell);
+      setDuration(preset.duration);
+      setStartupGCode(preset.startupGCode);
+      setEndOfMainWrap(preset.endOfMainWrap);
+      setEndOfCompleteWrap(preset.endOfCompleteWrap);
+    },
+    [
+      setIsEnablePump,
+      setPumpOnCode,
+      setPumpOffCode,
+      setCycPerShell,
+      setDuration,
+      setStartupGCode,
+      setEndOfMainWrap,
+      setEndOfCompleteWrap,
+    ]
+  );
+
+  useEffect(() => {
+    const loadPresetsFromStorage = async () => {
+      try {
+        const [
+          storedShellPresets,
+          storedMachinePresets,
+          storedShellSelection,
+          storedMachineSelection,
+        ] = await Promise.all([
+          getShellWrapPresets(),
+          getMachinePresets(),
+          getSelectedShellWrapPresetName(),
+          getSelectedMachinePresetName(),
+        ]);
+
+        const sortedShellPresets = sortPresets(storedShellPresets);
+        const sortedMachinePresets = sortPresets(storedMachinePresets);
+
+        setShellWrapPresets(sortedShellPresets);
+        setMachinePresets(sortedMachinePresets);
+
+        if (storedShellSelection) {
+          const preset = sortedShellPresets.find(
+            (item) => item.name === storedShellSelection
+          );
+          if (preset) {
+            applyShellWrapPreset(preset.data);
+            setSelectedShellWrapPreset(storedShellSelection);
+          }
+        }
+
+        if (storedMachineSelection) {
+          const preset = sortedMachinePresets.find(
+            (item) => item.name === storedMachineSelection
+          );
+          if (preset) {
+            applyMachinePreset(preset.data);
+            setSelectedMachinePreset(storedMachineSelection);
+          }
+        }
+      } catch (error) {
+        console.warn("Failed to load presets", error);
+      }
+    };
+
+    loadPresetsFromStorage();
+  }, [applyMachinePreset, applyShellWrapPreset]);
+
+  const shellPresetNames = useMemo(
+    () => shellWrapPresets.map((preset) => preset.name),
+    [shellWrapPresets]
+  );
+
+  const machinePresetNames = useMemo(
+    () => machinePresets.map((preset) => preset.name),
+    [machinePresets]
+  );
+
+  const handleSelectShellPreset = useCallback(
+    (name: string | null) => {
+      if (!name) {
+        setSelectedShellWrapPreset(null);
+        void saveSelectedShellWrapPresetName(null);
+        return;
+      }
+
+      const preset = shellWrapPresets.find((item) => item.name === name);
+      if (!preset) {
+        return;
+      }
+
+      applyShellWrapPreset(preset.data);
+      setSelectedShellWrapPreset(name);
+      void saveSelectedShellWrapPresetName(name);
+      displayToast(`Preset "${name}" loaded`);
+    },
+    [
+      applyShellWrapPreset,
+      displayToast,
+      shellWrapPresets,
+    ]
+  );
+
+  const handleSaveShellPresetPrompt = useCallback(() => {
+    const defaultName =
+      patternName.trim() ||
+      selectedShellWrapPreset ||
+      `Preset ${shellWrapPresets.length + 1}`;
+    setShellPresetNameInput(defaultName);
+    setShowShellPresetModal(true);
+  }, [patternName, selectedShellWrapPreset, shellWrapPresets.length]);
+
+  const handleConfirmSaveShellPreset = useCallback(() => {
+    const trimmedName = shellPresetNameInput.trim();
+    if (!trimmedName) {
+      displayToast("Preset name cannot be empty");
+      return;
+    }
+
+    const presetPayload: ShellWrapPresetData = {
+      patternName,
+      shellSize,
+      measSize,
+      diameter,
+      circ,
+      yaixs,
+      totalKick,
+      kickRatio,
+      tapeFeet,
+      shellDescription,
+      feedrate,
+      overwrap,
+      totalLayers,
+      perLayer,
+      isEnableBurnish,
+      burnishPcg,
+      rampStep,
+      startSpeed,
+      finalSpeed,
+    };
+
+    setShellWrapPresets((prev) => {
+      const existingIndex = prev.findIndex(
+        (preset) => preset.name === trimmedName
+      );
+      const next = existingIndex >= 0 ? [...prev] : [...prev, { name: trimmedName, data: presetPayload }];
+      if (existingIndex >= 0) {
+        next[existingIndex] = { name: trimmedName, data: presetPayload };
+      }
+      const sorted = sortPresets(next);
+      void saveShellWrapPresets(sorted);
+      return sorted;
+    });
+
+    setSelectedShellWrapPreset(trimmedName);
+    void saveSelectedShellWrapPresetName(trimmedName);
+    setShowShellPresetModal(false);
+    displayToast(`Preset "${trimmedName}" saved`);
+  }, [
+    shellPresetNameInput,
+    displayToast,
+    patternName,
+    shellSize,
+    measSize,
+    diameter,
+    circ,
+    yaixs,
+    totalKick,
+    kickRatio,
+    tapeFeet,
+    shellDescription,
+    feedrate,
+    overwrap,
+    totalLayers,
+    perLayer,
+    isEnableBurnish,
+    burnishPcg,
+    rampStep,
+    startSpeed,
+    finalSpeed,
+  ]);
+
+  const handleDeleteShellPreset = useCallback(() => {
+    if (!selectedShellWrapPreset) {
+      displayToast("Select a preset to delete");
+      return;
+    }
+
+    const filtered = shellWrapPresets.filter(
+      (preset) => preset.name !== selectedShellWrapPreset
+    );
+
+    if (filtered.length === shellWrapPresets.length) {
+      displayToast("Preset not found");
+      return;
+    }
+
+    const sorted = sortPresets(filtered);
+    setShellWrapPresets(sorted);
+    setSelectedShellWrapPreset(null);
+    void saveShellWrapPresets(sorted);
+    void saveSelectedShellWrapPresetName(null);
+    displayToast(`Preset "${selectedShellWrapPreset}" deleted`);
+  }, [
+    displayToast,
+    selectedShellWrapPreset,
+    shellWrapPresets,
+  ]);
+
+  const handleSelectMachinePreset = useCallback(
+    (name: string | null) => {
+      if (!name) {
+        setSelectedMachinePreset(null);
+        void saveSelectedMachinePresetName(null);
+        return;
+      }
+
+      const preset = machinePresets.find((item) => item.name === name);
+      if (!preset) {
+        return;
+      }
+
+      applyMachinePreset(preset.data);
+      setSelectedMachinePreset(name);
+      void saveSelectedMachinePresetName(name);
+      displayToast(`Preset "${name}" loaded`);
+    },
+    [applyMachinePreset, displayToast, machinePresets]
+  );
+
+  const handleSaveMachinePresetPrompt = useCallback(() => {
+    const defaultName =
+      selectedMachinePreset || `Machine Preset ${machinePresets.length + 1}`;
+    setMachinePresetNameInput(defaultName);
+    setShowMachinePresetModal(true);
+  }, [machinePresets.length, selectedMachinePreset]);
+
+  const handleConfirmSaveMachinePreset = useCallback(() => {
+    const trimmedName = machinePresetNameInput.trim();
+    if (!trimmedName) {
+      displayToast("Preset name cannot be empty");
+      return;
+    }
+
+    const presetPayload: MachinePresetData = {
+      isEnablePump,
+      pumpOnCode,
+      pumpOffCode,
+      cycPerShell,
+      duration,
+      startupGCode,
+      endOfMainWrap,
+      endOfCompleteWrap,
+    };
+
+    setMachinePresets((prev) => {
+      const existingIndex = prev.findIndex(
+        (preset) => preset.name === trimmedName
+      );
+      const next = existingIndex >= 0 ? [...prev] : [...prev, { name: trimmedName, data: presetPayload }];
+      if (existingIndex >= 0) {
+        next[existingIndex] = { name: trimmedName, data: presetPayload };
+      }
+      const sorted = sortPresets(next);
+      void saveMachinePresets(sorted);
+      return sorted;
+    });
+
+    setSelectedMachinePreset(trimmedName);
+    void saveSelectedMachinePresetName(trimmedName);
+    setShowMachinePresetModal(false);
+    displayToast(`Preset "${trimmedName}" saved`);
+  }, [
+    machinePresetNameInput,
+    displayToast,
+    isEnablePump,
+    pumpOnCode,
+    pumpOffCode,
+    cycPerShell,
+    duration,
+    startupGCode,
+    endOfMainWrap,
+    endOfCompleteWrap,
+  ]);
+
+  const handleDeleteMachinePreset = useCallback(() => {
+    if (!selectedMachinePreset) {
+      displayToast("Select a preset to delete");
+      return;
+    }
+
+    const filtered = machinePresets.filter(
+      (preset) => preset.name !== selectedMachinePreset
+    );
+
+    if (filtered.length === machinePresets.length) {
+      displayToast("Preset not found");
+      return;
+    }
+
+    const sorted = sortPresets(filtered);
+    setMachinePresets(sorted);
+    setSelectedMachinePreset(null);
+    void saveMachinePresets(sorted);
+    void saveSelectedMachinePresetName(null);
+    displayToast(`Preset "${selectedMachinePreset}" deleted`);
+  }, [
+    displayToast,
+    machinePresets,
+    selectedMachinePreset,
+  ]);
 
   const handleLoad = async () => {
     try {
@@ -610,6 +1005,11 @@ export default function Index() {
             setTapeFeet={setTapeFeet}
             shellDescription={shellDescription}
             setShellDescription={setShellDescription}
+            presetNames={shellPresetNames}
+            selectedPreset={selectedShellWrapPreset}
+            onSelectPreset={handleSelectShellPreset}
+            onSavePreset={handleSaveShellPresetPrompt}
+            onDeletePreset={handleDeleteShellPreset}
           />
         );
       case "WRAP":
@@ -633,6 +1033,11 @@ export default function Index() {
             setStartSpeed={setStartSpeed}
             finalSpeed={finalSpeed}
             setFinalSpeed={setFinalSpeed}
+            presetNames={shellPresetNames}
+            selectedPreset={selectedShellWrapPreset}
+            onSelectPreset={handleSelectShellPreset}
+            onSavePreset={handleSaveShellPresetPrompt}
+            onDeletePreset={handleDeleteShellPreset}
           />
         );
       case "MACHINE":
@@ -654,6 +1059,11 @@ export default function Index() {
             setEndOfMainWrap={setEndOfMainWrap}
             endOfCompleteWrap={endOfCompleteWrap}
             setEndOfCompleteWrap={setEndOfCompleteWrap}
+            presetNames={machinePresetNames}
+            selectedPreset={selectedMachinePreset}
+            onSelectPreset={handleSelectMachinePreset}
+            onSavePreset={handleSaveMachinePresetPrompt}
+            onDeletePreset={handleDeleteMachinePreset}
           />
         );
       default:
@@ -715,6 +1125,30 @@ export default function Index() {
       </ScrollView>
       {/* G-Code Preview - shown on all tabs */}
       <GCodePreview gCode={gCode} tapeFeet={tapeFeet} />
+
+      <TitleEditorModal
+        visible={showShellPresetModal}
+        value={shellPresetNameInput}
+        extensions={[]}
+        onChangeText={setShellPresetNameInput}
+        onSave={handleConfirmSaveShellPreset}
+        onCancel={() => setShowShellPresetModal(false)}
+        title="Save shell & wrap preset"
+        placeholder="Enter preset name"
+        confirmLabel="Save preset"
+      />
+
+      <TitleEditorModal
+        visible={showMachinePresetModal}
+        value={machinePresetNameInput}
+        extensions={[]}
+        onChangeText={setMachinePresetNameInput}
+        onSave={handleConfirmSaveMachinePreset}
+        onCancel={() => setShowMachinePresetModal(false)}
+        title="Save machine preset"
+        placeholder="Enter preset name"
+        confirmLabel="Save preset"
+      />
 
       <TitleEditorModal
         visible={showSaveFileTitleEditorModal}

@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import Card from "../components/shared/Card";
 import InputField from "../components/shared/InputField";
+import PresetSelector from "../components/shared/PresetSelector";
 
 interface ShellTabProps {
   patternName: string;
@@ -24,6 +25,11 @@ interface ShellTabProps {
   setTapeFeet: (text: string) => void;
   shellDescription: string;
   setShellDescription: (text: string) => void;
+  presetNames: string[];
+  selectedPreset: string | null;
+  onSelectPreset: (name: string | null) => void;
+  onSavePreset: () => void;
+  onDeletePreset: () => void;
 }
 
 const ShellTab = ({
@@ -47,9 +53,23 @@ const ShellTab = ({
   setTapeFeet,
   shellDescription,
   setShellDescription,
+  presetNames,
+  selectedPreset,
+  onSelectPreset,
+  onSavePreset,
+  onDeletePreset,
 }: ShellTabProps) => {
   return (
-    <Card title="Shell Size Variables">
+    <View>
+      <PresetSelector
+        title="Shell & Wrap Presets"
+        presets={presetNames}
+        selectedPreset={selectedPreset}
+        onSelectPreset={onSelectPreset}
+        onSavePreset={onSavePreset}
+        onDeletePreset={onDeletePreset}
+      />
+      <Card title="Shell Size Variables">
       <View style={styles.inputRow}>
         <InputField
           label="Pattern Name"
@@ -149,7 +169,8 @@ const ShellTab = ({
           required={true}
         />
       </View>
-    </Card>
+      </Card>
+    </View>
   );
 };
 

@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native";
 import AreaField from "../components/shared/AreaField";
 import Card from "../components/shared/Card";
 import InputField from "../components/shared/InputField";
+import PresetSelector from "../components/shared/PresetSelector";
 
 interface MachineTabProps {
   isEnablePump: boolean;
@@ -22,6 +23,11 @@ interface MachineTabProps {
   setEndOfMainWrap: (text: string) => void;
   endOfCompleteWrap: string;
   setEndOfCompleteWrap: (text: string) => void;
+  presetNames: string[];
+  selectedPreset: string | null;
+  onSelectPreset: (name: string | null) => void;
+  onSavePreset: () => void;
+  onDeletePreset: () => void;
 }
 
 const MachineTab = ({
@@ -41,6 +47,11 @@ const MachineTab = ({
   setEndOfMainWrap,
   endOfCompleteWrap,
   setEndOfCompleteWrap,
+  presetNames,
+  selectedPreset,
+  onSelectPreset,
+  onSavePreset,
+  onDeletePreset,
 }: MachineTabProps) => {
   const handleToggleChange = (enabled: boolean): void => {
     setIsEnablePump(enabled); // Update the parent state
@@ -48,6 +59,14 @@ const MachineTab = ({
 
   return (
     <View>
+      <PresetSelector
+        title="Machine Presets"
+        presets={presetNames}
+        selectedPreset={selectedPreset}
+        onSelectPreset={onSelectPreset}
+        onSavePreset={onSavePreset}
+        onDeletePreset={onDeletePreset}
+      />
       <Card
         title="Pump Variables"
         showToggle={true}
