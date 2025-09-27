@@ -1107,7 +1107,7 @@ export default function Index() {
       <View style={styles.patternNameContainer}>
         {/* <Text style={styles.patternNameLabel}>Pattern Name:</Text> */}
         <Text style={styles.patternNameValue}>
-          {openFileName || "Untitled"}
+          {openFileName || "Wrap Pattern Generator"}
         </Text>
         {/* <TouchableOpacity
           style={styles.editButton}
