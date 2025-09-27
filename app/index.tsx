@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
+import { shareAsync } from "expo-sharing";
 import React, { useCallback, useState } from "react";
 import {
   Platform,
@@ -278,7 +279,7 @@ export default function Index() {
         await FileSystem.writeAsStringAsync(fileUri, content);
 
         // Share the file so user can save it elsewhere
-        await FileSystem.shareAsync(fileUri, {
+        await shareAsync(fileUri, {
           mimeType: "application/json",
           dialogTitle: `Save ${fileName}.mum`,
           UTI: "public.json",
