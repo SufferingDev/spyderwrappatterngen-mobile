@@ -8,23 +8,31 @@
       "developmentClient": true,
       "distribution": "internal"
     },
-    "preview": {
+    "preview-apk": {
       "android": {
         "buildType": "apk"
       }
     },
-    "preview2": {
+    "preview-aab": {
       "android": {
-        "gradleCommand": ":app:assembleRelease"
+        "buildType": "app-bundle"
       }
     },
-    "preview3": {
-      "developmentClient": true
+    "production-apk": {
+      "android": {
+        "buildType": "apk"
+      }
     },
-    "preview4": {
-      "distribution": "internal"
+    "production-aab": {
+      "android": {
+        "buildType": "app-bundle"
+      }
     },
-    "production": {}
+    "production": {
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
   },
   "submit": {
     "production": {}

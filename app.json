@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "wrap-pattern",
-    "slug": "wrap-pattern",
+    "slug": "spyderwrapper",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,12 +9,14 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "city.vora.fleshprison.spyderwrap"
     },
     "extra": {
-    "eas": {
-      "projectId": "e9c7026d-102a-40f3-95a9-05c02d1cfa51"
-      }
+      "eas": {
+        "projectId": "21152434-386f-4929-a23e-6b133a642f0f"
+      },
+      "router": {}
     },
     "android": {
       "permissions": [
@@ -48,6 +50,7 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "owner": "tourmenteddev"
   }
 }
