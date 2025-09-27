@@ -188,4 +188,6 @@ const styles = StyleSheet.create({
   },
 });
 
+TitleEditorModal.displayName = "TitleEditorModal";
+
 export default TitleEditorModal;
