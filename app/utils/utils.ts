@@ -1,20 +1,28 @@
 export const roundToNearest25 = (inputValue: number): number => {
-    // Round the input value to the nearest integer
-    let value = Math.round(inputValue);
+    // Round the input value to the nearest integer first
+    const value = Math.round(inputValue);
 
-    // Calculate the remainder when divided by 25
+    // Calculate the remainder when divided by 25. For negative numbers JavaScript
+    // keeps the sign of the dividend, so we need to take its absolute value when
+    // comparing distances to the closest multiples of 25.
     const remainder = value % 25;
 
     if (remainder === 0) {
         // Already a multiple of 25
         return value;
-    } else if (remainder < 13) {
-        // Round down
-        return value - remainder;
-    } else {
-        // Round up
-        return value + (25 - remainder);
     }
+
+    const distanceToLower = Math.abs(remainder);
+    const distanceToUpper = 25 - distanceToLower;
+
+    if (distanceToLower < distanceToUpper) {
+        // The lower multiple is closer (covers both positive and negative numbers)
+        return value - remainder;
+    }
+
+    // Otherwise the upper multiple is closer. When the remainder is negative we
+    // need to subtract the distance to move further away from zero.
+    return remainder > 0 ? value + distanceToUpper : value - distanceToUpper;
 }
 
 export const isEven = (inputValue: number) : boolean => {
