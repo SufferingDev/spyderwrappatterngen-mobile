@@ -21,82 +21,83 @@ interface TitleEditorModalProps {
   title: string;
 }
 
-const TitleEditorModal = memo(
-  ({
-    visible,
-    value,
-    extensions = [".mum"],
-    selectedExtension = ".mum",
-    onChangeText,
-    onExtensionChange,
-    onSave,
-    onCancel,
-    title,
-  }: TitleEditorModalProps) => {
-    const handleSave = useCallback(() => {
-      // Perform validation before calling onSave
-      if (value.trim() !== "") {
-        onSave();
-      }
-    }, [value, onSave]);
+const TitleEditorModalComponent = ({
+  visible,
+  value,
+  extensions = [".mum"],
+  selectedExtension = ".mum",
+  onChangeText,
+  onExtensionChange,
+  onSave,
+  onCancel,
+  title,
+}: TitleEditorModalProps) => {
+  const handleSave = useCallback(() => {
+    // Perform validation before calling onSave
+    if (value.trim() !== "") {
+      onSave();
+    }
+  }, [value, onSave]);
 
-    return (
-      <Modal
-        visible={visible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={onCancel}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{title}</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={[
-                  styles.modalInput,
-                  extensions.length > 1
-                    ? styles.modalInputWithCombo
-                    : styles.modalInputFull,
-                ]}
-                value={value}
-                onChangeText={onChangeText}
-                placeholder="Enter pattern name"
-                autoFocus
-              />
-              {extensions.length > 1 && (
-                <View style={styles.extensionPicker}>
-                  <Picker
-                    selectedValue={selectedExtension}
-                    onValueChange={onExtensionChange}
-                    style={styles.picker}
-                  >
-                    {extensions.map((ext) => (
-                      <Picker.Item key={ext} label={ext} value={ext} />
-                    ))}
-                  </Picker>
-                </View>
-              )}
-            </View>
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={onCancel}
-              >
-                <Text style={styles.buttonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.saveButton]}
-                onPress={handleSave}
-              >
-                <Text style={styles.buttonText}>Save</Text>
-              </TouchableOpacity>
-            </View>
+  return (
+    <Modal
+      visible={visible}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={onCancel}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>{title}</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[
+                styles.modalInput,
+                extensions.length > 1
+                  ? styles.modalInputWithCombo
+                  : styles.modalInputFull,
+              ]}
+              value={value}
+              onChangeText={onChangeText}
+              placeholder="Enter pattern name"
+              autoFocus
+            />
+            {extensions.length > 1 && (
+              <View style={styles.extensionPicker}>
+                <Picker
+                  selectedValue={selectedExtension}
+                  onValueChange={onExtensionChange}
+                  style={styles.picker}
+                >
+                  {extensions.map((ext) => (
+                    <Picker.Item key={ext} label={ext} value={ext} />
+                  ))}
+                </Picker>
+              </View>
+            )}
+          </View>
+          <View style={styles.modalButtons}>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.cancelButton]}
+              onPress={onCancel}
+            >
+              <Text style={styles.buttonText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.saveButton]}
+              onPress={handleSave}
+            >
+              <Text style={styles.buttonText}>Save</Text>
+            </TouchableOpacity>
           </View>
         </View>
-      </Modal>
-    );
-  }
-);
+      </View>
+    </Modal>
+  );
+};
+
+const TitleEditorModal = memo(TitleEditorModalComponent);
+TitleEditorModal.displayName = "TitleEditorModal";
 
 const styles = StyleSheet.create({
   modalOverlay: {
