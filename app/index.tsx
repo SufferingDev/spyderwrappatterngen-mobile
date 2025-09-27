@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
 import React, { useCallback, useState } from "react";
 import {
   Platform,
@@ -90,11 +91,13 @@ export default function Index() {
   const [selectedExtension, setSelectedExtension] = useState(".mum");
   const fileExtensions = [".mum", ".gcode"]; // Add your extensions here
 
-  const displayToast = (message: string) => {
-    // setShowToast(false); // Hide any existing toast
-    setToastMessage(message);
-    setShowToast(true);
-  };
+  const displayToast = useCallback(
+    (message: string) => {
+      setToastMessage(message);
+      setShowToast(true);
+    },
+    [setShowToast, setToastMessage]
+  );
 
   const handleLoad = async () => {
     try {
@@ -121,9 +124,25 @@ export default function Index() {
         }
 
         // Read and parse JSON
-        const fileContent = await FileSystem.readAsStringAsync(
-          selectedFile.uri
-        );
+        let fileContent: string;
+        if (Platform.OS === "web") {
+          const webFile = (
+            selectedFile as unknown as {
+              file?: { text: () => Promise<string> };
+            }
+          ).file;
+          if (webFile) {
+            fileContent = await webFile.text();
+          } else {
+            const response = await fetch(selectedFile.uri);
+            if (!response.ok) {
+              throw new Error("Unable to read selected file");
+            }
+            fileContent = await response.text();
+          }
+        } else {
+          fileContent = await FileSystem.readAsStringAsync(selectedFile.uri);
+        }
 
         setOpenFilePath(selectedFile.uri);
         setOpenFileName(selectedFile.name);
@@ -168,7 +187,7 @@ export default function Index() {
     }
   };
 
-  const collectFormData = () => {
+  const collectFormData = useCallback(() => {
     const data = {
       Pattern_Name: patternName, // string
 
@@ -207,100 +226,173 @@ export default function Index() {
     // Convert to JSON string with indentation
     const formData = JSON.stringify(data, null, 2);
     return formData;
-  };
+  }, [
+    burnishPcg,
+    circ,
+    cycPerShell,
+    diameter,
+    duration,
+    endOfCompleteWrap,
+    endOfMainWrap,
+    feedrate,
+    finalSpeed,
+    isEnablePump,
+    kickRatio,
+    measSize,
+    patternName,
+    perLayer,
+    pumpOffCode,
+    pumpOnCode,
+    rampStep,
+    shellDescription,
+    shellSize,
+    startSpeed,
+    startupGCode,
+    tapeFeet,
+    totalKick,
+    totalLayers,
+    overwrap,
+    yaixs,
+  ]);
 
-  const pickFolderAndSave = async (
-    content: string,
-    fileName: string,
-    updateOpenFile: boolean = true
-  ): Promise<void> => {
-    try {
-      if (Platform.OS !== "android" && Platform.OS !== "ios") {
-        alert("File saving is only supported on mobile platforms");
-        return;
-      }
+  const pickFolderAndSave = useCallback(
+    async (
+      content: string,
+      fileName: string,
+      updateOpenFile: boolean = true
+    ): Promise<void> => {
+      try {
+        if (Platform.OS === "web") {
+          const targetFileName = updateOpenFile
+            ? `${fileName}.mum`
+            : fileName;
 
-      // For Android, we'll use the Storage Access Framework
-      if (Platform.OS === "android") {
-        try {
-          const permissions =
-            await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-
-          // User cancelled the folder picker
-          if (!permissions.granted || !permissions.directoryUri) {
-            // Don't show error, just return silently
-            return;
+          const doc = globalThis.document;
+          const urlApi = globalThis.URL;
+          if (!doc || !urlApi) {
+            throw new Error("Web saving is not supported in this environment");
           }
 
-          if (updateOpenFile === true) {
-            const fileUri =
-              await FileSystem.StorageAccessFramework.createFileAsync(
-                permissions.directoryUri,
-                fileName + ".mum",
-                "application/json"
-              );
+          const blob = new Blob([content], {
+            type: updateOpenFile ? "application/json" : "text/plain",
+          });
+          const url = urlApi.createObjectURL(blob);
 
-            setOpenFilePath(fileUri);
-            setOpenFileName(fileName + ".mum");
-            await FileSystem.writeAsStringAsync(fileUri, content);
-            displayToast(`File saved successfully as ${fileName}.mum`);
-          } else {
-            const fileUri =
-              await FileSystem.StorageAccessFramework.createFileAsync(
-                permissions.directoryUri,
-                fileName,
-                "application/octet-stream"
-              );
-            console.log("File URI:", fileUri);
-            await FileSystem.writeAsStringAsync(fileUri, content);
-            displayToast(`File saved successfully as ${fileName}`);
+          const anchor = doc.createElement("a");
+          anchor.href = url;
+          anchor.download = targetFileName;
+          doc.body.appendChild(anchor);
+          anchor.click();
+          doc.body.removeChild(anchor);
+          urlApi.revokeObjectURL(url);
+
+          if (updateOpenFile) {
+            setOpenFileName(targetFileName);
+            setOpenFilePath("");
           }
+          displayToast(`File downloaded as ${targetFileName}`);
+          return;
+        }
 
-          // await FileSystem.writeAsStringAsync(fileUri, content);
-          // displayToast(`File saved successfully as ${fileName}.mum`);
-        } catch (error) {
-          // Only show error if it's not a user cancellation
-          if (
-            error instanceof Error &&
-            !error.message.includes("User cancelled")
-          ) {
-            console.error("Error saving file:", error);
-            displayToast("Failed to save file. Please try again.");
+        if (Platform.OS !== "android" && Platform.OS !== "ios") {
+          alert("File saving is only supported on this platform");
+          return;
+        }
+
+        // For Android, we'll use the Storage Access Framework
+        if (Platform.OS === "android") {
+          try {
+            const permissions =
+              await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+            // User cancelled the folder picker
+            if (!permissions.granted || !permissions.directoryUri) {
+              // Don't show error, just return silently
+              return;
+            }
+
+            if (updateOpenFile === true) {
+              const fileUri =
+                await FileSystem.StorageAccessFramework.createFileAsync(
+                  permissions.directoryUri,
+                  fileName + ".mum",
+                  "application/json"
+                );
+
+              setOpenFilePath(fileUri);
+              setOpenFileName(fileName + ".mum");
+              await FileSystem.writeAsStringAsync(fileUri, content);
+              displayToast(`File saved successfully as ${fileName}.mum`);
+            } else {
+              const fileUri =
+                await FileSystem.StorageAccessFramework.createFileAsync(
+                  permissions.directoryUri,
+                  fileName,
+                  "application/octet-stream"
+                );
+              console.log("File URI:", fileUri);
+              await FileSystem.writeAsStringAsync(fileUri, content);
+              displayToast(`File saved successfully as ${fileName}`);
+            }
+
+            // await FileSystem.writeAsStringAsync(fileUri, content);
+            // displayToast(`File saved successfully as ${fileName}.mum`);
+          } catch (error) {
+            // Only show error if it's not a user cancellation
+            if (
+              error instanceof Error &&
+              !error.message.includes("User cancelled")
+            ) {
+              console.error("Error saving file:", error);
+              displayToast("Failed to save file. Please try again.");
+            }
+          }
+        }
+        // For iOS, we'll use document picker to get a security-scoped URL
+        else if (Platform.OS === "ios") {
+          // On iOS, we can save to the app's documents directory
+          const documentDirectory = FileSystem.documentDirectory;
+          const fileUri = `${documentDirectory}${fileName}.mum`;
+
+          await FileSystem.writeAsStringAsync(fileUri, content);
+
+          // Share the file so user can save it elsewhere
+          await Sharing.shareAsync(fileUri, {
+            mimeType: "application/json",
+            dialogTitle: `Save ${fileName}.mum`,
+            UTI: "public.json",
+          });
+        }
+      } catch (err: unknown) {
+        console.error("Error saving file:", err);
+
+        if (err instanceof Error) {
+          // Only show error message if it's not related to user cancellation
+          if (!err.message.includes("cancelled")) {
+            displayToast(`Failed to save file: ${err.message}`);
           }
         }
       }
-      // For iOS, we'll use document picker to get a security-scoped URL
-      else if (Platform.OS === "ios") {
-        // On iOS, we can save to the app's documents directory
-        const documentDirectory = FileSystem.documentDirectory;
-        const fileUri = `${documentDirectory}${fileName}.mum`;
-
-        await FileSystem.writeAsStringAsync(fileUri, content);
-
-        // Share the file so user can save it elsewhere
-        await FileSystem.shareAsync(fileUri, {
-          mimeType: "application/json",
-          dialogTitle: `Save ${fileName}.mum`,
-          UTI: "public.json",
-        });
-      }
-    } catch (err: unknown) {
-      console.error("Error saving file:", err);
-
-      if (err instanceof Error) {
-        // Only show error message if it's not related to user cancellation
-        if (!err.message.includes("cancelled")) {
-          displayToast(`Failed to save file: ${err.message}`);
-        }
-      }
-    }
-  };
+    },
+    [displayToast, setOpenFileName, setOpenFilePath]
+  );
 
   const handleSave = async () => {
     if (validateInputValues() === false) {
       return;
     }
     try {
+      if (Platform.OS === "web") {
+        if (!openFileName) {
+          handleSaveAsNew();
+          return;
+        }
+
+        const formData = collectFormData();
+        pickFolderAndSave(formData, openFileName.replace(/\.mum$/, ""), true);
+        return;
+      }
+
       // If Save As New
       if (openFilePath.trim() === "") {
         handleSaveAsNew();
@@ -357,14 +449,7 @@ export default function Index() {
     // }
 
     // pickFolderAndSave(gCode, patternName + "_gcode");
-  }, [
-    gCode,
-    patternName,
-    setToastMessage,
-    setShowToast,
-    setTmpOpenFileName,
-    setShowExportFileTitleEditorModal,
-  ]);
+  }, [displayToast, gCode]);
 
   const validateInputValues = () => {
     const shellFields = [
@@ -588,7 +673,7 @@ export default function Index() {
     setShowSaveFileTitleEditorModal(false);
     const formData = collectFormData();
     pickFolderAndSave(formData, tmpOpenFileName, true);
-  }, [tmpOpenFileName]);
+  }, [collectFormData, pickFolderAndSave, tmpOpenFileName]);
 
   const handleExportTitleSave = () => {
     const ext = utils.getFileExtension(tmpExportFileName);
