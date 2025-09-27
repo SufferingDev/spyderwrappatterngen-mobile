@@ -144,7 +144,7 @@ export default Card;
 
 */
 
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { StyleSheet, Switch, Text, View } from "react-native";
 
 interface CardProps {
@@ -163,6 +163,10 @@ const Card = ({
   onToggleChange,
 }: CardProps) => {
   const [enabled, setEnabled] = useState(initialEnabled);
+
+  useEffect(() => {
+    setEnabled(initialEnabled);
+  }, [initialEnabled]);
 
   const handleToggleChange = (value: boolean) => {
     setEnabled(value);

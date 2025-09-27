@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import Card from "../components/shared/Card";
 import InputField from "../components/shared/InputField";
+import PresetSelector from "../components/shared/PresetSelector";
 
 interface WrapTabProps {
   feedrate: string;
@@ -23,6 +24,11 @@ interface WrapTabProps {
   setStartSpeed: (text: string) => void;
   finalSpeed: string;
   setFinalSpeed: (text: string) => void;
+  presetNames: string[];
+  selectedPreset: string | null;
+  onSelectPreset: (name: string | null) => void;
+  onSavePreset: () => void;
+  onDeletePreset: () => void;
 }
 
 const WrapTab = ({
@@ -45,6 +51,11 @@ const WrapTab = ({
   setStartSpeed,
   finalSpeed,
   setFinalSpeed,
+  presetNames,
+  selectedPreset,
+  onSelectPreset,
+  onSavePreset,
+  onDeletePreset,
 }: WrapTabProps) => {
   const handleToggleChange = (enabled: boolean) => {
     setIsEnableBurnish(enabled); // Update the parent state
@@ -52,6 +63,14 @@ const WrapTab = ({
 
   return (
     <View>
+      <PresetSelector
+        title="Shell & Wrap Presets"
+        presets={presetNames}
+        selectedPreset={selectedPreset}
+        onSelectPreset={onSelectPreset}
+        onSavePreset={onSavePreset}
+        onDeletePreset={onDeletePreset}
+      />
       <Card title="Wrap Speed Variables">
         <View style={styles.inputRow}>
           <InputField

@@ -19,6 +19,9 @@ interface TitleEditorModalProps {
   onSave: () => void;
   onCancel: () => void;
   title: string;
+  placeholder?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
 }
 
 const TitleEditorModal = memo(
@@ -32,6 +35,9 @@ const TitleEditorModal = memo(
     onSave,
     onCancel,
     title,
+    placeholder = "Enter pattern name",
+    confirmLabel = "Save",
+    cancelLabel = "Cancel",
   }: TitleEditorModalProps) => {
     const handleSave = useCallback(() => {
       // Perform validation before calling onSave
@@ -60,7 +66,7 @@ const TitleEditorModal = memo(
                 ]}
                 value={value}
                 onChangeText={onChangeText}
-                placeholder="Enter pattern name"
+                placeholder={placeholder}
                 autoFocus
               />
               {extensions.length > 1 && (
@@ -82,13 +88,13 @@ const TitleEditorModal = memo(
                 style={[styles.modalButton, styles.cancelButton]}
                 onPress={onCancel}
               >
-                <Text style={styles.buttonText}>Cancel</Text>
+                <Text style={styles.buttonText}>{cancelLabel}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, styles.saveButton]}
                 onPress={handleSave}
               >
-                <Text style={styles.buttonText}>Save</Text>
+                <Text style={styles.buttonText}>{confirmLabel}</Text>
               </TouchableOpacity>
             </View>
           </View>
